@@ -1,17 +1,8 @@
 Metadata-Version: 1.0
-Name: elementtree
-Version: 1.3a3-20070912-preview
-Summary: ElementTree - a light-weight XML object model for Python.
-Home-page: http://effbot.org/zone/element-index.htm
-Author: Fredrik Lundh
-Author-email: fredrik@pythonware.com
+Name: emeraldtree
+Version: undefined
+Summary: EmeraldTree - a light-weight XML object model for Python.
+Author: Bastian Blank
+Author-email: bblank@thinkmo.de
 License: Python (MIT style)
-Download-URL: http://effbot.org/downloads#elementtree
-Description: The Element type is a flexible container object, designed to store
-        hierarchical data structures in memory.  Element structures can be
-        converted to and from XML.
-Platform: Python 1.5.2 and later.
-Classifier: Development Status :: 6 - Mature
-Classifier: Operating System :: OS Independent
-Classifier: Topic :: Text Processing :: Markup :: HTML
-Classifier: Topic :: Text Processing :: Markup :: XML
+Platform: Python 2.4 and later.
