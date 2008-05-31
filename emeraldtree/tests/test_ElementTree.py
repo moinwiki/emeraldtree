@@ -18,3 +18,5 @@ def test_Element_append():
     assert serialize(elem) == '<a><b /></a>'
     elem.append(Element('c'))
     assert serialize(elem) == '<a><b /><c /></a>'
+    elem.append('d')
+    assert serialize(elem) == '<a><b /><c />d</a>'
