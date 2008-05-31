@@ -509,13 +509,12 @@ class Element(Node):
     # @defreturn iterator
 
     def itertext(self):
-        if self.text:
-            yield self.text
         for e in self:
-            for s in e.itertext():
-                yield s
-            if e.tail:
-                yield e.tail
+            if isinstance(e, Element):
+                for s in e.itertext():
+                    yield s
+            elif isinstance(e, basestring):
+                yield e
 
 # compatibility
 _Element = _ElementInterface = Element
