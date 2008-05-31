@@ -20,3 +20,28 @@ def test_Element_append():
     assert serialize(elem) == '<a><b /><c /></a>'
     elem.append('d')
     assert serialize(elem) == '<a><b /><c />d</a>'
+
+def test_XMLParser_simple1():
+    elem = XML('<a />')
+    assert elem.tag == 'a'
+    assert len(elem) == 0
+
+def test_XMLParser_simple2():
+    elem = XML('<a><b /></a>')
+    assert elem.tag == 'a'
+    assert len(elem) == 1
+    assert elem[0].tag == 'b'
+    assert len(elem[0]) == 0
+
+def test_XMLParser_text1():
+    elem = XML('<a>b</a>')
+    assert elem.tag == 'a'
+    assert len(elem) == 1
+
+def test_XMLParser_text2():
+    elem = XML('<a>b<c>d</c>d</a>')
+    assert elem.tag == 'a'
+    assert len(elem) == 3
+    assert elem[0] == 'b'
+    assert elem[1].tag == 'c'
+    assert elem[2] == 'd'
