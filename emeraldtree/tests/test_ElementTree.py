@@ -109,3 +109,19 @@ def test_XMLParser_text2():
     assert elem[0] == 'b'
     assert elem[1].tag == 'c'
     assert elem[2] == 'd'
+
+def test_XMLParser_namespace():
+    elem = XML('<a:a xmlns:a="a"/>')
+    assert elem.tag == QName('a', 'a')
+    assert serialize(elem) == '<ns0:a xmlns:ns0="a" />'
+
+    elem = XML('<a:a xmlns:a="a" a="a"/>')
+    assert elem.tag == QName('a', 'a')
+    assert elem.attrib == {'a': 'a'}
+    assert serialize(elem) == '<ns0:a a="a" xmlns:ns0="a" />'
+
+    elem = XML('<a:a xmlns:a="a" a:a="a"/>')
+    assert elem.tag == QName('a', 'a')
+    assert elem.attrib == {QName('a', 'a'): 'a'}
+    assert serialize(elem) == '<ns0:a ns0:a="a" xmlns:ns0="a" />'
+
