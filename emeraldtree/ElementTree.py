@@ -552,10 +552,9 @@ def SubElement(parent, tag, attrib={}, **extra):
 # @return An element instance, representing a comment.
 # @defreturn Element
 
-def Comment(text=None):
-    element = Element(Comment)
-    element.text = text
-    return element
+class Comment(Node):
+    def __init__(self, text = None):
+        self.text = text
 
 ##
 # PI element factory.  This factory function creates a special element
@@ -567,12 +566,9 @@ def Comment(text=None):
 # @return An element instance, representing a PI.
 # @defreturn Element
 
-def ProcessingInstruction(target, text=None):
-    element = Element(ProcessingInstruction)
-    element.text = target
-    if text:
-        element.text = element.text + " " + text
-    return element
+class ProcessingInstruction(Node):
+    def __init__(self, target, text = None):
+        self.target, self.text = target, text
 
 PI = ProcessingInstruction
 
@@ -830,40 +826,38 @@ def _namespaces(elem, encoding, default_namespace=None):
             _raise_serialization_error(qname)
 
     # populate qname and namespaces table
-    try:
-        iterate = elem.iter
-    except AttributeError:
-        iterate = elem.getiterator # cET compatibility
-    for elem in iterate():
-        tag = elem.tag
-        if isinstance(tag, QName) and tag.text not in qnames:
-            add_qname(tag.text)
-        elif isinstance(tag, basestring):
-            if tag not in qnames:
-                add_qname(tag)
-        elif tag is not None and tag is not Comment and tag is not PI:
-            _raise_serialization_error(tag)
-        for key, value in elem.items():
-            if isinstance(key, QName):
-                key = key.text
-            if key not in qnames:
-                add_qname(key)
-            if isinstance(value, QName) and value.text not in qnames:
-                add_qname(value.text)
-        text = elem.text
-        if isinstance(text, QName) and text.text not in qnames:
-            add_qname(text.text)
+    if isinstance(elem, Element):
+        for elem in elem.iter():
+            tag = elem.tag
+            if isinstance(tag, QName) and tag.text not in qnames:
+                add_qname(tag.text)
+            elif isinstance(tag, basestring):
+                if tag not in qnames:
+                    add_qname(tag)
+            elif tag is not None and tag is not Comment and tag is not PI:
+                _raise_serialization_error(tag)
+            for key, value in elem.items():
+                if isinstance(key, QName):
+                    key = key.text
+                if key not in qnames:
+                    add_qname(key)
+                if isinstance(value, QName) and value.text not in qnames:
+                    add_qname(value.text)
+            text = elem.text
+            if isinstance(text, QName) and text.text not in qnames:
+                add_qname(text.text)
     return qnames, namespaces
 
 def _serialize_xml(write, elem, encoding, qnames, namespaces):
-    tag = elem.tag
-    text = elem.text
-    if tag is Comment:
-        write("<!--%s-->" % _escape_cdata(text, encoding))
-    elif tag is ProcessingInstruction:
-        write("<?%s?>" % _escape_cdata(text, encoding))
-    else:
-        tag = qnames[tag]
+    if isinstance(elem, Comment):
+        write("<!--%s-->" % _escape_cdata(elem.text, encoding))
+    elif isinstance(elem, ProcessingInstruction):
+        text = _escape_cdata(elem.target, encoding)
+        if elem.text is not None:
+            text += ' ' + _escape_cdata(elem.text, encoding)
+        write("<?%s?>" % text)
+    elif isinstance(elem, Element):
+        tag = qnames[elem.tag]
         if tag is None:
             for e in elem:
                 _serialize_xml(write, e, encoding, qnames, None)
