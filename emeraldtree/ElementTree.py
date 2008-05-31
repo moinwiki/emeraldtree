@@ -121,8 +121,6 @@ __all__ = [
 # structure, and convert it from and to XML.
 ##
 
-import sys, re
-
 class _SimpleElementPath(object):
     # emulate pre-1.2 find/findtext/findall behaviour
     def find(self, element, tag):
@@ -972,6 +970,7 @@ def _serialize_text(write, elem, encoding):
 #     invalid.
 
 def register_namespace(prefix, uri):
+    import re
     if re.match("ns\d+$", prefix):
         raise ValueError("Prefix format reserved for internal use")
     for k, v in _namespace_map.items():
@@ -1098,6 +1097,7 @@ def tostringlist(element, encoding=None):
 
 def dump(elem):
     # debugging
+    import sys
     if not isinstance(elem, ElementTree):
         elem = ElementTree(elem)
     elem.write(sys.stdout)
