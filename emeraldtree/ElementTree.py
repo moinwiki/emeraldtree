@@ -165,9 +165,7 @@ class ParseError(SyntaxError):
 # @defreturn flag
 
 def iselement(element):
-    # FIXME: not sure about this; might be a better idea to look
-    # for tag/attrib/text attributes
-    return isinstance(element, Element) or hasattr(element, "tag")
+    return isinstance(element, (Node, basestring))
 
 class Node(object):
     """
@@ -485,7 +483,11 @@ class Element(Node):
         if tag is None or self.tag == tag:
             yield self
         for e in self._children:
-            for e in e.iter(tag):
+            if isinstance(e, Element):
+                for e in e.iter(tag):
+                    yield e
+            # TODO
+            elif isinstance(e, Node):
                 yield e
 
     # compatibility (FIXME: preserve list behaviour too? see below)
@@ -892,7 +894,10 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
                 if text:
                     write(_escape_cdata(text, encoding))
                 for e in elem:
-                    _serialize_xml(write, e, encoding, qnames, None)
+                    if isinstance(e, Node):
+                        _serialize_xml(write, e, encoding, qnames, None)
+                    else:
+                        write(_escape_cdata(unicode(e), encoding))
                 write("</" + tag + ">")
             else:
                 write(" />")
