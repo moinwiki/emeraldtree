@@ -737,7 +737,7 @@ class ElementTree(object):
 # --------------------------------------------------------------------
 # serialization support
 
-def _namespaces(elem, encoding, default_namespace=None):
+def _namespaces(elem, encoding, default_namespace = None):
     # identify namespaces used in this tree
 
     # maps qnames to *encoded* prefix:local names
@@ -752,11 +752,14 @@ def _namespaces(elem, encoding, default_namespace=None):
         return text.encode(encoding)
 
     def add_qname(qname):
+        if qname in qnames:
+            return
+
         # calculate serialized qname representation
         try:
-            if qname[:1] == "{":
-                uri, tag = qname[1:].split("}", 1)
-                prefix = namespaces.get(uri)
+            if qname.uri is not None:
+                uri = qname.uri
+                prefix = namespaces.get(uri, None)
                 if prefix is None:
                     prefix = _namespace_map.get(uri)
                     if prefix is None:
@@ -764,9 +767,9 @@ def _namespaces(elem, encoding, default_namespace=None):
                     if prefix != "xml":
                         namespaces[uri] = prefix
                 if prefix:
-                    qnames[qname] = encode("%s:%s" % (prefix, tag))
+                    qnames[qname] = encode("%s:%s" % (prefix, qname.name))
                 else:
-                    qnames[qname] = encode(tag) # default element
+                    qnames[qname] = encode(qname.name)
             else:
                 if default_namespace:
                     # FIXME: can this be handled in XML 1.0?
@@ -774,31 +777,30 @@ def _namespaces(elem, encoding, default_namespace=None):
                         "cannot use non-qualified names with "
                         "default_namespace option"
                         )
-                qnames[qname] = encode(qname)
+                qnames[qname] = encode(qname.name)
         except TypeError:
             _raise_serialization_error(qname)
 
     # populate qname and namespaces table
     if isinstance(elem, Element):
         for elem in elem.iter():
-            tag = elem.tag
-            if isinstance(tag, QName) and tag.text not in qnames:
-                add_qname(tag.text)
-            elif isinstance(tag, basestring):
-                if tag not in qnames:
+            if isinstance(elem, Element):
+                tag = elem.tag
+                if isinstance(tag, QName):
                     add_qname(tag)
-            elif tag is not None and tag is not Comment and tag is not PI:
-                _raise_serialization_error(tag)
-            for key, value in elem.items():
-                if isinstance(key, QName):
-                    key = key.text
-                if key not in qnames:
-                    add_qname(key)
-                if isinstance(value, QName) and value.text not in qnames:
-                    add_qname(value.text)
-            text = elem.text
-            if isinstance(text, QName) and text.text not in qnames:
-                add_qname(text.text)
+                elif isinstance(tag, basestring):
+                    add_qname(QName(tag))
+                elif tag is not None:
+                    _raise_serialization_error(tag)
+
+                for key in elem.keys():
+                    if isinstance(key, QName):
+                        add_qname(key)
+                    elif isinstance(key, basestring):
+                        add_qname(QName(key))
+                    elif key is not None:
+                        _raise_serialization_error(key)
+
     return qnames, namespaces
 
 def _serialize_xml(write, elem, encoding, qnames, namespaces):
