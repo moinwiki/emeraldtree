@@ -10,19 +10,68 @@ def serialize(elem, **options):
 
 def test_Element():
     elem = Element('a')
-    assert serialize(elem) == '<a />'
     assert isinstance(elem, Node)
+    assert elem.tag == 'a'
+    assert elem
+
+def test_Element__len__():
+    elem = Element('a')
+    elem._children = range(10)
+
+    assert len(elem) == 10
+
+def test_Element___getitem__():
+    elem = Element('a')
+    elem._children = [Element('b'), Element('c')]
+
+    assert elem[0].tag == 'b'
+    assert elem[1].tag == 'c'
+    assert len(elem[:1]) == 1
+    assert len(elem[:2]) == 2
+    assert len(elem[:3]) == 2
+    assert len(elem[1:3]) == 1
+    assert len(elem[2:3]) == 0
+    assert elem[:2][0].tag == 'b'
+    assert elem[:2][1].tag == 'c'
+
+def test_Element___setitem__():
+    elem = Element('a')
+    elem._children = [Element('b1'), Element('b2')]
+
+    elem[0] = Element('c')
+    assert elem[0].tag == 'c'
+    assert elem[1].tag == 'b2'
+
+    elem[1] = Element('d')
+    assert elem[0].tag == 'c'
+    assert elem[1].tag == 'd'
+
+    elem[0:0] = [Element('e')]
+    assert elem[0].tag == 'e'
+    assert elem[1].tag == 'c'
+    assert elem[2].tag == 'd'
+
+def test_Element___delitem__():
+    elem = Element('a')
+    elem._children = [Element('b1'), Element('b2')]
+
+    del elem[0]
+    assert len(elem) == 1
+    assert elem[0].tag == 'b2'
 
 def test_Element_append():
     elem = Element('a')
     elem.append(Element('b'))
-    assert serialize(elem) == '<a><b /></a>'
+    assert len(elem) == 1
+    assert elem[0].tag == 'b'
 
     elem.append(Element('c'))
-    assert serialize(elem) == '<a><b /><c /></a>'
+    assert len(elem) == 2
+    assert elem[1].tag == 'c'
 
     elem.append('d')
-    assert serialize(elem) == '<a><b /><c />d</a>'
+    assert len(elem) == 3
+    assert elem[2] == 'd'
 
 def test_Element_iter():
     elem = Element('a')
