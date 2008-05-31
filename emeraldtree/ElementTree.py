@@ -211,6 +211,9 @@ class Element(Node):
     def __len__(self):
         return len(self._children)
 
+    def __nonzero__(self):
+        return True
+
     ##
     # Returns the given subelement.
     #
