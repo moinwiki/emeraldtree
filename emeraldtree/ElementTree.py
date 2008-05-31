@@ -209,14 +209,19 @@ class Element(Node):
     # (Attribute) Text before first subelement.  This is either a
     # string or the value None, if there was no text.
 
-    text = None
+    @property
+    def text(self):
+        if len(self) and isinstance(self[0], basestring):
+            return self[0]
 
     ##
     # (Attribute) Text after this element's end tag, but before the
     # next sibling element's start tag.  This is either a string or
     # the value None, if there was no text.
 
-    tail = None # text after end tag, if any
+    @property
+    def tail(self):
+        raise RuntimeError('The tail argument is not supported')
 
     def __init__(self, tag, attrib={}, **extra):
         attrib = attrib.copy()
@@ -421,7 +426,6 @@ class Element(Node):
     def clear(self):
         self.attrib.clear()
         self._children = []
-        self.text = self.tail = None
 
     ##
     # Gets an element attribute.
@@ -862,8 +866,6 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
     else:
         tag = qnames[tag]
         if tag is None:
-            if text:
-                write(_escape_cdata(text, encoding))
             for e in elem:
                 _serialize_xml(write, e, encoding, qnames, None)
         else:
@@ -889,10 +891,8 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
                             k.encode(encoding),
                             _escape_attrib(v, encoding)
                             ))
-            if text or len(elem):
+            if len(elem):
                 write(">")
-                if text:
-                    write(_escape_cdata(text, encoding))
                 for e in elem:
                     if isinstance(e, Node):
                         _serialize_xml(write, e, encoding, qnames, None)
@@ -901,8 +901,6 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
                 write("</" + tag + ">")
             else:
                 write(" />")
-    if elem.tail:
-        write(_escape_cdata(elem.tail, encoding))
 
 HTML_EMPTY = ("area", "base", "basefont", "br", "col", "frame", "hr",
               "img", "input", "isindex", "link", "meta" "param")
@@ -1302,7 +1300,6 @@ class TreeBuilder(object):
         self._data = [] # data collector
         self._elem = [] # element stack
         self._last = None # last element
-        self._tail = None # true if we're after an end tag
         if element_factory is None:
             element_factory = Element
         self._factory = element_factory
@@ -1321,14 +1318,8 @@ class TreeBuilder(object):
 
     def _flush(self):
         if self._data:
-            if self._last is not None:
-                text = "".join(self._data)
-                if self._tail:
-                    assert self._last.tail is None, "internal error (tail)"
-                    self._last.tail = text
-                else:
-                    assert self._last.text is None, "internal error (text)"
-                    self._last.text = text
+            text = "".join(self._data)
+            self._elem[-1].append(text)
             self._data = []
 
     ##
@@ -1354,7 +1345,6 @@ class TreeBuilder(object):
         if self._elem:
             self._elem[-1].append(elem)
         self._elem.append(elem)
-        self._tail = 0
         return elem
 
     ##
@@ -1370,7 +1360,6 @@ class TreeBuilder(object):
         assert self._last.tag == tag,\
                "end tag mismatch (expected %s, got %s)" % (
                    self._last.tag, tag)
-        self._tail = 1
         return self._last
 
 ##
