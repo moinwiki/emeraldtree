@@ -96,7 +96,7 @@ __all__ = [
     "TreeBuilder",
     "VERSION",
     "XML",
-    "XMLParser", "XMLTreeBuilder",
+    "XMLParser",
     ]
 
 ##
@@ -121,32 +121,7 @@ __all__ = [
 # structure, and convert it from and to XML.
 ##
 
-class _SimpleElementPath(object):
-    # emulate pre-1.2 find/findtext/findall behaviour
-    def find(self, element, tag):
-        for elem in element:
-            if elem.tag == tag:
-                return elem
-        return None
-    def findtext(self, element, tag, default=None):
-        for elem in element:
-            if elem.tag == tag:
-                return elem.text or ""
-        return default
-    def findall(self, element, tag):
-        if tag[:3] == ".//":
-            return element.getiterator(tag[3:])
-        result = []
-        for elem in element:
-            if elem.tag == tag:
-                result.append(elem)
-        return result
-
-try:
-    import ElementPath
-except ImportError:
-    # FIXME: issue warning in this case?
-    ElementPath = _SimpleElementPath()
+import ElementPath
 
 VERSION = "1.3a2"
 
@@ -248,15 +223,6 @@ class Element(Node):
 
     def __len__(self):
         return len(self._children)
-
-    def __nonzero__(self):
-        import warnings
-        warnings.warn(
-            "The behavior of this method will change in future versions. "
-            "Use specific 'len(elem)' or 'elem is not None' test instead.",
-            FutureWarning
-            )
-        return len(self._children) != 0 # emulate old behaviour
 
     ##
     # Returns the given subelement.
@@ -365,22 +331,6 @@ class Element(Node):
     def remove(self, element):
         assert iselement(element)
         self._children.remove(element)
-
-    ##
-    # (Deprecated) Returns all subelements.  The elements are returned
-    # in document order.
-    #
-    # @return A list of subelements.
-    # @defreturn list of Element instances
-
-    def getchildren(self):
-        import warnings
-        warnings.warn(
-            "This method will be removed in future versions. "
-            "Use 'list(elem)' or iteration over elem instead.",
-            DeprecationWarning
-            )
-        return self._children
 
     ##
     # Finds the first matching subelement, by tag name or path.
@@ -492,12 +442,6 @@ class Element(Node):
             elif isinstance(e, Node):
                 yield e
 
-    # compatibility (FIXME: preserve list behaviour too? see below)
-    getiterator = iter
-
-    # def getiterator(self, tag=None):
-    #     return list(tag)
-
     ##
     # Creates a text iterator.  The iterator loops over this element
     # and all subelements, in document order, and returns all inner
@@ -513,9 +457,6 @@ class Element(Node):
                     yield s
             elif isinstance(e, basestring):
                 yield e
-
-# compatibility
-_Element = _ElementInterface = Element
 
 ##
 # Subelement factory.  This function creates an element instance, and
@@ -1530,5 +1471,3 @@ class XMLParser(object):
         del self.target, self._parser # get rid of circular references
         return tree
 
-# compatibility
-XMLTreeBuilder = XMLParser
