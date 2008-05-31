@@ -16,10 +16,38 @@ def test_Element_append():
     elem = Element('a')
     elem.append(Element('b'))
     assert serialize(elem) == '<a><b /></a>'
+
     elem.append(Element('c'))
     assert serialize(elem) == '<a><b /><c /></a>'
+
     elem.append('d')
     assert serialize(elem) == '<a><b /><c />d</a>'
+
+def test_Element_iter():
+    elem = Element('a')
+    l = list(elem.iter())
+    assert len(l) == 1
+
+    elem.append('b')
+    l = list(elem.iter())
+    assert len(l) == 1
+
+    elem.append(Element('c'))
+    l = list(elem.iter())
+    assert len(l) == 2
+
+    elem.append('d')
+    l = list(elem.iter())
+    assert len(l) == 2
+
+def test_Element_itertext():
+    elem = Element('a')
+    l = list(elem.itertext())
+    assert len(l) == 0
+
+    elem.append('b')
+    l = list(elem.itertext())
+    assert len(l) == 1
 
 def test_XMLParser_simple1():
     elem = XML('<a />')
