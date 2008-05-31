@@ -515,25 +515,39 @@ PI = ProcessingInstruction
 # QName wrapper.  This can be used to wrap a QName attribute value, in
 # order to get proper namespace handling on output.
 #
-# @param text A string containing the QName value, in the form {uri}local,
-#     or, if the tag argument is given, the URI part of a QName.
-# @param tag Optional tag.  If given, the first argument is interpreted as
-#     an URI, and this argument is interpreted as a local name.
 # @return An opaque object, representing the QName.
 
 class QName(object):
-    def __init__(self, text_or_uri, tag=None):
-        if tag:
-            text_or_uri = "{%s}%s" % (text_or_uri, tag)
-        self.text = text_or_uri
+    def __init__(self, text, uri = None):
+        if text[0] == '{':
+            if uri is not None:
+                raise ValueError
+            i = text.find('}')
+            if i == -1:
+                raise ValueError
+            uri = text[1:i]
+            text = text[i + 1:]
+        self.name, self.uri = text, uri
+
     def __str__(self):
         return self.text
+
     def __hash__(self):
         return hash(self.text)
+
     def __cmp__(self, other):
         if isinstance(other, QName):
-            return cmp(self.text, other.text)
+            c = cmp(self.uri, other.uri)
+            if c:
+                return c
+            return cmp(self.name, other.name)
         return cmp(self.text, other)
+
+    @property
+    def text(self):
+        if self.uri is not None:
+            return '{' + self.uri + '}' + self.name
+        return self.name
 
 # --------------------------------------------------------------------
 
