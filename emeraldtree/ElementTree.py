@@ -887,13 +887,12 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
             if len(elem):
                 write(">")
                 for e in elem:
-                    if isinstance(e, Node):
-                        _serialize_xml(write, e, encoding, qnames, None)
-                    else:
-                        write(_escape_cdata(unicode(e), encoding))
+                    _serialize_xml(write, e, encoding, qnames, None)
                 write("</" + tag + ">")
             else:
                 write(" />")
+    else:
+        write(_escape_cdata(unicode(elem), encoding))
 
 HTML_EMPTY = ("area", "base", "basefont", "br", "col", "frame", "hr",
               "img", "input", "isindex", "link", "meta" "param")
