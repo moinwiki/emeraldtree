@@ -1,3 +1,4 @@
+import py.test
 from emeraldtree.ElementTree import *
 
 def serialize(elem, **options):
@@ -7,7 +8,7 @@ def serialize(elem, **options):
     tree.write(file, **options)
     return file.getvalue()
 
-def test_Element___init__():
+def test_Element():
     elem = Element('a')
     assert serialize(elem) == '<a />'
     assert isinstance(elem, Node)
@@ -61,6 +62,28 @@ def test_ProcessingInstruction():
 
     elem = ProcessingInstruction('a', 'b')
     assert serialize(elem) == '<?a b?>'
+
+def test_QName():
+    qname = QName('a')
+    assert qname.uri is None
+    assert qname.name == 'a'
+    assert str(qname) == 'a'
+    assert qname.text == 'a'
+
+    qname = QName('{b}a')
+    assert qname.uri == 'b'
+    assert qname.name == 'a'
+    assert str(qname) == '{b}a'
+    assert qname.text == '{b}a'
+
+    qname = QName('a', 'b')
+    assert qname.uri == 'b'
+    assert qname.name == 'a'
+    assert str(qname) == '{b}a'
+    assert qname.text == '{b}a'
+
+    py.test.raises(ValueError, QName, '{ba')
+    py.test.raises(ValueError, QName, '{b}a', 'c')
 
 def test_XMLParser_simple1():
     elem = XML('<a />')
