@@ -49,6 +49,19 @@ def test_Element_itertext():
     l = list(elem.itertext())
     assert len(l) == 1
 
+def test_Comment():
+    elem = Comment('a')
+    assert serialize(elem) == '<!--a-->'
+    assert isinstance(elem, Node)
+
+def test_ProcessingInstruction():
+    elem = ProcessingInstruction('a')
+    assert serialize(elem) == '<?a?>'
+    assert isinstance(elem, ProcessingInstruction)
+
+    elem = ProcessingInstruction('a', 'b')
+    assert serialize(elem) == '<?a b?>'
+
 def test_XMLParser_simple1():
     elem = XML('<a />')
     assert elem.tag == 'a'
