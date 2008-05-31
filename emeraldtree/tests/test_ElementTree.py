@@ -1,4 +1,4 @@
-from emeraldtree.ElementTree import ElementTree, Element
+from emeraldtree.ElementTree import *
 
 def serialize(elem, **options):
     from cStringIO import StringIO
@@ -10,6 +10,7 @@ def serialize(elem, **options):
 def test_Element___init__():
     elem = Element('a')
     assert serialize(elem) == '<a />'
+    assert isinstance(elem, Node)
 
 def test_Element_append():
     elem = Element('a')

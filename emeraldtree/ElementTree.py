@@ -87,6 +87,7 @@ __all__ = [
     "Element", "ElementTree",
     "fromstring", "fromstringlist",
     "iselement", "iterparse",
+    "Node",
     "parse", "ParseError",
     "PI", "ProcessingInstruction",
     "QName",
@@ -168,6 +169,11 @@ def iselement(element):
     # for tag/attrib/text attributes
     return isinstance(element, Element) or hasattr(element, "tag")
 
+class Node(object):
+    """
+    Node class.
+    """
+
 ##
 # Element class.  This class defines the Element interface, and
 # provides a reference implementation of this interface.
@@ -183,7 +189,7 @@ def iselement(element):
 # @see Comment
 # @see ProcessingInstruction
 
-class Element(object):
+class Element(Node):
     # <tag attrib>text<child/>...</tag>tail
 
     ##
