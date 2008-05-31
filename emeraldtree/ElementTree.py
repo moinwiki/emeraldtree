@@ -94,7 +94,6 @@ __all__ = [
     "SubElement",
     "tostring", "tostringlist",
     "TreeBuilder",
-    "VERSION",
     "XML",
     "XMLParser",
     ]
@@ -122,8 +121,6 @@ __all__ = [
 ##
 
 import ElementPath
-
-VERSION = "1.3a2"
 
 class ParseError(SyntaxError):
     pass
