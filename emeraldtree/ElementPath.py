@@ -194,7 +194,8 @@ def findall(elem, path):
         if path[:1] == "/":
             raise SyntaxError("cannot use absolute path on element")
         stream = iter(xpath_tokenizer(path))
-        next = stream.next; token = next()
+        next = stream.next
+        token = next()
         selector = []
         while 1:
             try:

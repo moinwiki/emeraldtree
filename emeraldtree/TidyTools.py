@@ -78,7 +78,7 @@ def getbody(file, **options):
 
     # get xhtml tree
     try:
-        tree = apply(tidy, (file,), options)
+        tree = apply(tidy, (file, ), options)
         if tree is None:
             return
     except IOError, v:
