@@ -183,12 +183,12 @@ class Element(Node):
     def tail(self):
         raise RuntimeError('The tail argument is not supported')
 
-    def __init__(self, tag, attrib={}, **extra):
+    def __init__(self, tag, attrib={}, children=[], **extra):
         attrib = attrib.copy()
         attrib.update(extra)
         self.tag = tag
         self.attrib = attrib
-        self._children = []
+        self._children = children[:]
 
     def __repr__(self):
         return "<Element %s at %x>" % (repr(self.tag), id(self))
@@ -475,7 +475,7 @@ PI = ProcessingInstruction
 # @return An opaque object, representing the QName.
 
 class QName(object):
-    def __init__(self, text, uri = None):
+    def __init__(self, text, uri=None):
         if text[0] == '{':
             if uri is not None:
                 raise ValueError

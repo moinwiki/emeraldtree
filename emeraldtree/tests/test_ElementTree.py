@@ -15,14 +15,12 @@ def test_Element():
     assert elem
 
 def test_Element__len__():
-    elem = Element('a')
-    elem._children = range(10)
+    elem = Element('a', children = range(10))
 
     assert len(elem) == 10
 
 def test_Element___getitem__():
-    elem = Element('a')
-    elem._children = [Element('b'), Element('c')]
+    elem = Element('a', children = [Element('b'), Element('c')])
 
     assert elem[0].tag == 'b'
     assert elem[1].tag == 'c'
@@ -35,8 +33,7 @@ def test_Element___getitem__():
     assert elem[:2][1].tag == 'c'
 
 def test_Element___setitem__():
-    elem = Element('a')
-    elem._children = [Element('b1'), Element('b2')]
+    elem = Element('a', children = [Element('b1'), Element('b2')])
 
     elem[0] = Element('c')
     assert elem[0].tag == 'c'
@@ -52,8 +49,7 @@ def test_Element___setitem__():
     assert elem[2].tag == 'd'
 
 def test_Element___delitem__():
-    elem = Element('a')
-    elem._children = [Element('b1'), Element('b2')]
+    elem = Element('a', children = [Element('b1'), Element('b2')])
 
     del elem[0]
     assert len(elem) == 1
@@ -149,7 +145,10 @@ def test_XMLParser_simple2():
 def test_XMLParser_text1():
     elem = XML('<a>b</a>')
     assert elem.tag == 'a'
+    assert isinstance(elem, Element)
     assert len(elem) == 1
+    assert elem[0] == 'b'
+    assert isinstance(elem[0], unicode)
 
 def test_XMLParser_text2():
     elem = XML('<a>b<c>d</c>d</a>')
