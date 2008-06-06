@@ -10,14 +10,20 @@ def serialize(elem, **options):
 
 def test_Element():
     elem = Element('a')
+
     assert isinstance(elem, Node)
     assert elem.tag == 'a'
-    assert elem
 
 def test_Element__len__():
     elem = Element('a', children = range(10))
 
     assert len(elem) == 10
+
+def test_Element__nonzero__():
+    elem = Element('a')
+
+    assert elem
+    assert len(elem) == 0
 
 def test_Element___getitem__():
     elem = Element('a', children = [Element('b'), Element('c')])
@@ -57,6 +63,7 @@ def test_Element___delitem__():
 
 def test_Element_append():
     elem = Element('a')
+
     elem.append(Element('b'))
     assert len(elem) == 1
     assert elem[0].tag == 'b'
