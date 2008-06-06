@@ -86,7 +86,7 @@ __all__ = [
     "dump",
     "Element", "ElementTree",
     "fromstring", "fromstringlist",
-    "iselement", "iterparse",
+    "iterparse",
     "Node",
     "parse", "ParseError",
     "PI", "ProcessingInstruction",
@@ -126,16 +126,6 @@ class ParseError(SyntaxError):
     pass
 
 # --------------------------------------------------------------------
-
-##
-# Checks if an object appears to be a valid element object.
-#
-# @param An element instance.
-# @return A true value if this is an element object.
-# @defreturn flag
-
-def iselement(element):
-    return isinstance(element, (Node, basestring))
 
 class Node(object):
     """
@@ -234,10 +224,9 @@ class Element(Node):
 
     def __setitem__(self, index, element):
         if isinstance(index, slice):
-            for elem in element:
-                assert iselement(elem)
+            element = [self._check_node(i) for i in element]
         else:
-            assert iselement(element)
+            element = self._check_node(element)
         self._children.__setitem__(index, element)
 
     ##
@@ -249,6 +238,14 @@ class Element(Node):
     def __delitem__(self, index):
         self._children.__delitem__(index)
 
+    @staticmethod
+    def _check_node(node):
+        if isinstance(node, (Node, unicode)):
+            return node
+        if isinstance(node, str):
+            return unicode(node)
+        raise TypeError
+
     ##
     # Adds a subelement to the end of this element.
     #
@@ -256,7 +253,7 @@ class Element(Node):
     # @exception AssertionError If a sequence member is not a valid object.
 
     def append(self, element):
-        assert iselement(element)
+        element = self._check_node(element)
         self._children.append(element)
 
     ##
@@ -267,8 +264,7 @@ class Element(Node):
     # @since 1.3
 
     def extend(self, elements):
-        for element in elements:
-            assert iselement(element)
+        elements = [self._check_node(i) for i in elements]
         self._children.extend(elements)
 
     ##
@@ -278,7 +274,7 @@ class Element(Node):
     # @exception AssertionError If the element is not a valid object.
 
     def insert(self, index, element):
-        assert iselement(element)
+        element = self._check_node(element)
         self._children.insert(index, element)
 
     ##
@@ -291,7 +287,6 @@ class Element(Node):
     # @exception AssertionError If the element is not a valid object.
 
     def remove(self, element):
-        assert iselement(element)
         self._children.remove(element)
 
     ##
@@ -525,7 +520,7 @@ class QName(object):
 class ElementTree(object):
 
     def __init__(self, element=None, file=None):
-        assert element is None or iselement(element)
+        assert element is None or isinstance(element, Node)
         self._root = element # first node
         if file:
             self.parse(file)
@@ -538,17 +533,6 @@ class ElementTree(object):
 
     def getroot(self):
         return self._root
-
-    ##
-    # Replaces the root element for this tree.  This discards the
-    # current contents of the tree, and replaces it with the given
-    # element.  Use with care.
-    #
-    # @param element An element instance.
-
-    def _setroot(self, element):
-        assert iselement(element)
-        self._root = element
 
     ##
     # Loads an external XML document into this element tree.
