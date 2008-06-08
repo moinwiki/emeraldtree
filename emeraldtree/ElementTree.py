@@ -486,6 +486,9 @@ class QName(object):
             text = text[i + 1:]
         self.name, self.uri = text, uri
 
+    def __repr__(self):
+        return '%s(%r, %r)' % (self.__class__.__name__, self.name, self.uri)
+
     def __str__(self):
         return self.text
 
@@ -1329,7 +1332,8 @@ class XMLParser(object):
         if key in self._names:
             return self._names[key].copy()
         if '}' in key:
-            name = QName(*key.split('}', 1))
+            uri, name = key.split('}', 1)
+            name = QName(name, uri)
         else:
             name = QName(key)
         self._names[key] = name
