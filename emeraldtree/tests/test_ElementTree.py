@@ -167,6 +167,7 @@ def test_XMLParser_text2():
 
 def test_XMLParser_namespace():
     elem = XML('<a:a xmlns:a="a"/>')
+    assert isinstance(elem.tag, QName)
     assert elem.tag == QName('a', 'a')
     assert serialize(elem) == '<ns0:a xmlns:ns0="a" />'
 
