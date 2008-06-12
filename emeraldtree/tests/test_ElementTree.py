@@ -115,15 +115,17 @@ def test_ProcessingInstruction():
     elem = ProcessingInstruction('a', 'b')
     assert serialize(elem) == '<?a b?>'
 
-def test_QName():
+def test_QName___init__():
     qname = QName('a')
     assert qname.uri is None
     assert qname.name == 'a'
+    assert isinstance(qname.name, unicode)
     assert str(qname) == 'a'
     assert qname.text == 'a'
 
     qname = QName('{b}a')
     assert qname.uri == 'b'
+    assert isinstance(qname.uri, unicode)
     assert qname.name == 'a'
     assert str(qname) == '{b}a'
     assert qname.text == '{b}a'
@@ -136,6 +138,12 @@ def test_QName():
 
     py.test.raises(ValueError, QName, '{ba')
     py.test.raises(ValueError, QName, '{b}a', 'c')
+
+def test_QName___cmp__():
+    qname1 = QName('a')
+    qname2 = QName('a')
+
+    assert cmp(qname1, qname2) == 0
 
 def test_XMLParser_simple1():
     elem = XML('<a />')

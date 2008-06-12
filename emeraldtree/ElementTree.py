@@ -476,6 +476,7 @@ PI = ProcessingInstruction
 
 class QName(object):
     def __init__(self, text, uri=None):
+        text = unicode(text)
         if text[0] == '{':
             if uri is not None:
                 raise ValueError
