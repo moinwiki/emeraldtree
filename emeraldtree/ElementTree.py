@@ -658,7 +658,8 @@ class ElementTree(object):
               encoding="us-ascii",
               xml_declaration=None,
               default_namespace=None,
-              method=None):
+              method=None,
+              namespaces={}):
         assert self._root is not None
         if not hasattr(file, "write"):
             file = open(file, "wb")
@@ -674,7 +675,7 @@ class ElementTree(object):
             _serialize_text(write, self._root, encoding)
         else:
             qnames, namespaces = _namespaces(
-                self._root, encoding, default_namespace
+                self._root, encoding, default_namespace, namespaces
                 )
             if method == "xml":
                 _serialize_xml(
@@ -690,16 +691,18 @@ class ElementTree(object):
 # --------------------------------------------------------------------
 # serialization support
 
-def _namespaces(elem, encoding, default_namespace = None):
+def _namespaces(elem, encoding, default_namespace, namespaces):
     # identify namespaces used in this tree
 
     # maps qnames to *encoded* prefix:local names
     qnames = {None: None}
 
     # maps uri:s to prefixes
-    namespaces = {}
+    candidate_namespaces = _namespace_map.copy()
+    candidate_namespaces.update(namespaces)
     if default_namespace:
-        namespaces[default_namespace] = ""
+        candidate_namespaces[default_namespace] = ""
+    used_namespaces = {}
 
     def encode(text):
         return text.encode(encoding)
@@ -712,13 +715,13 @@ def _namespaces(elem, encoding, default_namespace = None):
         try:
             if qname.uri is not None:
                 uri = qname.uri
-                prefix = namespaces.get(uri, None)
+                prefix = used_namespaces.get(uri, None)
                 if prefix is None:
-                    prefix = _namespace_map.get(uri)
+                    prefix = candidate_namespaces.get(uri, None)
                     if prefix is None:
                         prefix = "ns%d" % len(namespaces)
                     if prefix != "xml":
-                        namespaces[uri] = prefix
+                        used_namespaces[uri] = prefix
                 if prefix:
                     qnames[qname] = encode("%s:%s" % (prefix, qname.name))
                 else:
@@ -754,7 +757,7 @@ def _namespaces(elem, encoding, default_namespace = None):
                     elif key is not None:
                         _raise_serialization_error(key)
 
-    return qnames, namespaces
+    return qnames, used_namespaces
 
 def _serialize_xml(write, elem, encoding, qnames, namespaces):
     if isinstance(elem, Comment):
