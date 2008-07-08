@@ -76,6 +76,47 @@ def test_Element_append():
     assert len(elem) == 3
     assert elem[2] == 'd'
 
+def test_Element_extend():
+    pass
+
+def test_Element_insert():
+    pass
+
+def test_Element_remove():
+    pass
+
+def test_Element_find():
+    elem_1 = Element('b1')
+    elem_2 = Element('b2')
+    elem = Element('a', children=[elem_1, elem_2])
+
+    result = elem.find('b1')
+    assert result is elem_1
+
+    result = elem.find('b2')
+    assert result is elem_2
+
+def test_Element_findtext():
+    pass
+
+def test_Element_findall():
+    pass
+
+def test_Element_clear():
+    pass
+
+def test_Element_get():
+    pass
+
+def test_Element_set():
+    pass
+
+def test_Element_keys():
+    pass
+
+def test_Element_items():
+    pass
+
 def test_Element_iter():
     elem = Element('a')
     l = list(elem.iter())
