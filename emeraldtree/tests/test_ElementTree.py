@@ -86,21 +86,53 @@ def test_Element_remove():
     pass
 
 def test_Element_find():
-    elem_1 = Element('b1')
-    elem_2 = Element('b2')
-    elem = Element('a', children=[elem_1, elem_2])
+    child_1 = Element('b1')
+    child_2 = Element('b2')
+    elem = Element('a', children=[child_1, child_2])
 
     result = elem.find('b1')
-    assert result is elem_1
+    assert result is child_1
 
     result = elem.find('b2')
-    assert result is elem_2
+    assert result is child_2
+
+    child_1 = Element(QName('b1', 'url1'))
+    child_2 = Element(QName('{url2}b2'))
+    elem = Element('a', children=[child_1, child_2])
+
+    result = elem.find('{url1}b1')
+    assert result is child_1
 
 def test_Element_findtext():
     pass
 
 def test_Element_findall():
-    pass
+    child_1 = Element('b1')
+    child_2 = Element('b2')
+    child_3 = "text"
+    elem = Element('a', children=[child_1, child_2, child_3])
+
+    result = list(elem.findall('b1'))
+    assert len(result) == 1
+    assert result[0] is child_1
+
+    result = list(elem.findall('b2'))
+    assert len(result) == 1
+    assert result[0] is child_2
+
+    result = list(elem.findall('*'))
+    assert len(result) == 3
+    assert result[0] is child_1
+    assert result[1] is child_2
+    assert result[2] is child_3
+
+    child_1 = Element(QName('b1', 'url1'))
+    child_2 = Element(QName('{url2}b2'))
+    elem = Element('a', children=[child_1, child_2])
+
+    result = list(elem.findall('{url1}b1'))
+    assert len(result) == 1
+    assert result[0] is child_1
 
 def test_Element_clear():
     pass
@@ -184,7 +216,16 @@ def test_QName___cmp__():
     qname1 = QName('a')
     qname2 = QName('a')
 
-    assert cmp(qname1, qname2) == 0
+    assert qname1 == qname2
+    assert qname1 == 'a'
+    assert 'a' == qname1
+
+    qname1 = QName('a', 'b')
+    qname2 = QName('{b}a')
+
+    assert qname1 == qname2
+    assert qname1 == '{b}a'
+    assert '{b}a' == qname1
 
 def test_XMLParser_simple1():
     elem = XML('<a />')
