@@ -64,11 +64,12 @@ xpath_tokenizer = re.compile(
     ).findall
 
 def prepare_tag(next, token):
+    from ElementTree import Element
     tag = token[1]
     def select(context, result):
         for elem in result:
             for e in elem:
-                if e.tag == tag:
+                if isinstance(e, Element) and e.tag == tag:
                     yield e
     return select
 
