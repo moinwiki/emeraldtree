@@ -122,6 +122,8 @@ __all__ = [
 
 import ElementPath
 
+_marker = object()
+
 class ParseError(SyntaxError):
     pass
 
@@ -339,10 +341,12 @@ class Element(Node):
     # @param default What to return if the attribute was not found.
     # @return The attribute value, or the default value, if the
     #     attribute was not found.
-    # @defreturn string or None
 
-    def get(self, key, default=None):
-        return self.attrib.get(key, default)
+    def get(self, key, default=_marker):
+        ret = self.attrib.get(key, default)
+        if ret is default and default is _marker:
+            raise KeyError(key)
+        return ret
 
     ##
     # Sets an element attribute.
