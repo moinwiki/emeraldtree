@@ -372,6 +372,15 @@ class Element(Node):
     def items(self):
         return self.attrib.items()
 
+    def __iter__(self):
+        """
+        Creates a element iterator.  The iterator loops over all (non text)
+        children.
+        """
+        for e in self._children:
+            if isinstance(e, Node):
+                yield e
+
     ##
     # Creates a tree iterator.  The iterator loops over this element
     # and all subelements, in document order, and returns all elements
