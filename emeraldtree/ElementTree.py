@@ -474,6 +474,8 @@ PI = ProcessingInstruction
 # @return An opaque object, representing the QName.
 
 class QName(object):
+    __slots__ = 'text', 'name', 'uri'
+
     def __init__(self, text, uri=None):
         text = unicode(text)
         if text[0] == '{':
@@ -485,6 +487,11 @@ class QName(object):
             uri = text[1:i]
             text = text[i + 1:]
         self.name, self.uri = text, uri
+
+        if self.uri is not None:
+            self.text = '{' + self.uri + '}' + self.name
+        else:
+            self.text = self.name
 
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__, self.name, self.uri)
@@ -505,12 +512,6 @@ class QName(object):
 
     def copy(self):
         return self.__class__(self.name, self.uri)
-
-    @property
-    def text(self):
-        if self.uri is not None:
-            return '{' + self.uri + '}' + self.name
-        return self.name
 
 # --------------------------------------------------------------------
 
