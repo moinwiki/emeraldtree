@@ -504,10 +504,7 @@ class QName(object):
 
     def __cmp__(self, other):
         if isinstance(other, QName):
-            c = cmp(self.uri, other.uri)
-            if c:
-                return c
-            return cmp(self.name, other.name)
+            return cmp(self.text, other.text)
         return cmp(self.text, other)
 
     def copy(self):
