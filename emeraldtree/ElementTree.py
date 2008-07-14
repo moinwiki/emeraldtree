@@ -374,12 +374,9 @@ class Element(Node):
 
     def __iter__(self):
         """
-        Creates a element iterator.  The iterator loops over all (non text)
-        children.
+        Creates a element iterator.  The iterator loops over all children.
         """
-        for e in self._children:
-            if isinstance(e, Node):
-                yield e
+        return self._children.__iter__()
 
     ##
     # Creates a tree iterator.  The iterator loops over this element
@@ -403,8 +400,7 @@ class Element(Node):
             if isinstance(e, Element):
                 for e in e.iter(tag):
                     yield e
-            # TODO
-            elif isinstance(e, Node):
+            else:
                 yield e
 
     ##
