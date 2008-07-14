@@ -759,41 +759,32 @@ def _namespaces(elem, encoding, default_namespace, namespaces):
     return qnames, used_namespaces
 
 def _serialize_xml(write, elem, encoding, qnames, namespaces):
-    if isinstance(elem, Comment):
-        write("<!--%s-->" % _escape_cdata(elem.text, encoding))
-    elif isinstance(elem, ProcessingInstruction):
-        text = _escape_cdata(elem.target, encoding)
-        if elem.text is not None:
-            text += ' ' + _escape_cdata(elem.text, encoding)
-        write("<?%s?>" % text)
-    elif isinstance(elem, Element):
+    if isinstance(elem, Element):
         tag = qnames[elem.tag]
-        if tag is None:
-            for e in elem:
-                _serialize_xml(write, e, encoding, qnames, None)
-        else:
+
+        if tag is not None:
             write("<" + tag)
-            items = elem.items()
-            if items or namespaces:
-                items.sort() # lexical order
+
+            if elem.attrib:
+                items = elem.attrib.items()
+                items.sort(key=lambda x: x[0])
                 for k, v in items:
-                    if isinstance(k, QName):
-                        k = k.text
+                    k = qnames[k]
                     if isinstance(v, QName):
-                        v = qnames[v.text]
+                        v = qnames[v]
                     else:
                         v = _escape_attrib(v, encoding)
-                    write(" %s=\"%s\"" % (qnames[k], v))
-                if namespaces:
-                    items = namespaces.items()
-                    items.sort(key=lambda x: x[1]) # sort on prefix
-                    for v, k in items:
-                        if k:
-                            k = ":" + k
-                        write(" xmlns%s=\"%s\"" % (
-                            k.encode(encoding),
-                            _escape_attrib(v, encoding)
-                            ))
+                    write(' ' + k + '="' + v + '"')
+            if namespaces:
+                items = namespaces.items()
+                items.sort(key=lambda x: x[1]) # sort on prefix
+                for v, k in items:
+                    if k:
+                        k = ":" + k
+                    write(" xmlns%s=\"%s\"" % (
+                        k.encode(encoding),
+                        _escape_attrib(v, encoding)
+                        ))
             if len(elem):
                 write(">")
                 for e in elem:
@@ -801,6 +792,20 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
                 write("</" + tag + ">")
             else:
                 write(" />")
+
+        else:
+            for e in elem:
+                _serialize_xml(write, e, encoding, qnames, None)
+
+    elif isinstance(elem, Comment):
+        write("<!--%s-->" % _escape_cdata(elem.text, encoding))
+
+    elif isinstance(elem, ProcessingInstruction):
+        text = _escape_cdata(elem.target, encoding)
+        if elem.text is not None:
+            text += ' ' + _escape_cdata(elem.text, encoding)
+        write("<?%s?>" % text)
+
     else:
         write(_escape_cdata(unicode(elem), encoding))
 
