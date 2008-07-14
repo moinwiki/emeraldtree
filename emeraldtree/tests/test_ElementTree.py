@@ -156,15 +156,15 @@ def test_Element_iter():
 
     elem.append('b')
     l = list(elem.iter())
-    assert len(l) == 1
+    assert len(l) == 2
 
     elem.append(Element('c'))
     l = list(elem.iter())
-    assert len(l) == 2
+    assert len(l) == 3
 
     elem.append('d')
     l = list(elem.iter())
-    assert len(l) == 2
+    assert len(l) == 4
 
 def test_Element_itertext():
     elem = Element('a')
