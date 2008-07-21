@@ -183,12 +183,12 @@ class Element(Node):
     def tail(self):
         raise RuntimeError('The tail argument is not supported')
 
-    def __init__(self, tag, attrib={}, children=[], **extra):
-        attrib = attrib.copy()
+    def __init__(self, tag, attrib=None, children=(), **extra):
+        attrib = attrib and attrib.copy() or {}
         attrib.update(extra)
         self.tag = tag
         self.attrib = attrib
-        self._children = children[:]
+        self._children = list(children)
 
     def __repr__(self):
         return "<Element %s at %x>" % (repr(self.tag), id(self))
@@ -433,8 +433,8 @@ class Element(Node):
 # @return An element instance.
 # @defreturn Element
 
-def SubElement(parent, tag, attrib={}, **extra):
-    attrib = attrib.copy()
+def SubElement(parent, tag, attrib=None, **extra):
+    attrib = attrib and attrib.copy() or {}
     attrib.update(extra)
     element = parent.makeelement(tag, attrib)
     parent.append(element)
@@ -661,7 +661,7 @@ class ElementTree(object):
               xml_declaration=None,
               default_namespace=None,
               method=None,
-              namespaces={}):
+              namespaces=None):
         assert self._root is not None
         if not hasattr(file, "write"):
             file = open(file, "wb")
@@ -701,7 +701,8 @@ def _namespaces(elem, encoding, default_namespace, namespaces):
 
     # maps uri:s to prefixes
     candidate_namespaces = _namespace_map.copy()
-    candidate_namespaces.update(namespaces)
+    if namespaces:
+        candidate_namespaces.update(namespaces)
     if default_namespace:
         candidate_namespaces[default_namespace] = ""
     used_namespaces = {}
@@ -721,7 +722,7 @@ def _namespaces(elem, encoding, default_namespace, namespaces):
                 if prefix is None:
                     prefix = candidate_namespaces.get(uri, None)
                     if prefix is None:
-                        prefix = "ns%d" % len(namespaces)
+                        prefix = "ns%d" % len(used_namespaces)
                     if prefix != "xml":
                         used_namespaces[uri] = prefix
                 if prefix:
