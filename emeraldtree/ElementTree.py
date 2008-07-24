@@ -478,42 +478,48 @@ PI = ProcessingInstruction
 #
 # @return An opaque object, representing the QName.
 
-class QName(object):
-    __slots__ = 'text', 'name', 'uri'
+class QName(unicode):
+    __slots__ = 'name', 'uri'
 
-    def __init__(self, text, uri=None):
-        text = unicode(text)
-        if text[0] == '{':
+    def __new__(cls, name, uri=None):
+        text = name = unicode(name)
+
+        if name[0] == '{':
             if uri is not None:
                 raise ValueError
-            i = text.find('}')
+            i = name.find('}')
             if i == -1:
                 raise ValueError
-            uri = text[1:i]
-            text = text[i + 1:]
-        self.name, self.uri = text, uri
+            uri = name[1:i]
+            name = name[i + 1:]
 
-        if self.uri is not None:
-            self.text = '{' + self.uri + '}' + self.name
-        else:
-            self.text = self.name
+        if uri is not None:
+            text = '{' + uri + '}' + name
+
+        ret = unicode.__new__(cls, text)
+        unicode.__setattr__(ret, 'name', name)
+        unicode.__setattr__(ret, 'uri', uri)
+
+        return ret
+
+    def __getnewargs__(self):
+        return self.name, self.uri
+
+    def __getstate__(self):
+        pass
 
     def __repr__(self):
         return '%s(%r, %r)' % (self.__class__.__name__, self.name, self.uri)
 
-    def __str__(self):
-        return self.text
-
-    def __hash__(self):
-        return hash(self.text)
-
-    def __cmp__(self, other):
-        if isinstance(other, QName):
-            return cmp(self.text, other.text)
-        return cmp(self.text, other)
+    def __setattr__(self, key, value):
+        raise AttributeError('read-only')
 
     def copy(self):
         return self.__class__(self.name, self.uri)
+
+    @property
+    def text(self):
+        return self
 
 # --------------------------------------------------------------------
 
