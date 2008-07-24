@@ -256,18 +256,18 @@ def test_XMLParser_text2():
     assert elem[2] == 'd'
 
 def test_XMLParser_namespace():
-    elem = XML('<a:b xmlns:a="c"/>')
+    elem = XML('<b xmlns="c" d="e"/>')
     assert isinstance(elem.tag, QName)
     assert elem.tag == QName('b', 'c')
-    assert serialize(elem) == '<ns0:b xmlns:ns0="c" />'
-
-    elem = XML('<a:b xmlns:a="c" d="e"/>')
-    assert elem.tag == QName('b', 'c')
-    assert elem.attrib == {'d': 'e'}
+    assert elem.attrib == {QName('d', None): 'e'}
     assert serialize(elem) == '<ns0:b d="e" xmlns:ns0="c" />'
+    assert serialize(elem, default_namespace='c') == '<ns0:b d="e" xmlns:ns0="c" />'
 
-    elem = XML('<a:b xmlns:a="c" a:d="e"/>')
+    elem = XML('<a:b xmlns:a="c" d="e" a:f="g"/>')
+    assert isinstance(elem.tag, QName)
     assert elem.tag == QName('b', 'c')
-    assert elem.attrib == {QName('d', 'c'): 'e'}
-    assert serialize(elem) == '<ns0:b ns0:d="e" xmlns:ns0="c" />'
+    assert elem.attrib == {'d': 'e', QName('f', 'c'): 'g'}
+    assert serialize(elem) == '<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
+    assert serialize(elem, default_namespace='c') == '<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
+
 
