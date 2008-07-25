@@ -1,4 +1,25 @@
-$Id: README 3277 2007-09-12 07:14:03Z fredrik $
+EmeraldTree is a fork of the ElementTree library
+================================================
+
+Main differences:
+ * We are using a slightly different API:
+   * Handling of text: it uses unicode objects as children (not as
+     "tail" attributes of the elements)
+ * API cleanups, removing backward compatibility 
+ * Better unicode support
+ * Other improvements / optimizations
+
+The fork happened at ElementTree 1.3a3-20070912-preview, for more details
+please see the EmeraldTree repository:
+
+   http://hg.moinmo.in/EmeraldTree/
+
+Changes are (c) by their authors (see also source files) and licensed
+under the same BSD license as ElementTree (see below):
+ * Bastian Blank <bblank@thinkmo.de>
+
+
+Here is the original README contents of ElementTree:
 
 =======================
 The elementtree library
