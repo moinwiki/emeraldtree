@@ -1,8 +1,8 @@
-EmeraldTree is a fork of the ElementTree library
-================================================
+EmeraldTree, a light-weight toolkit for XML processing in Python
+================================================================
 
-Main differences:
- * We are using a slightly different API:
+EmeraldTree is a fork of ElementTree - the main differences are:
+ * It has a slightly different API:
    * Handling of text: it uses unicode objects as children (not as
      "tail" attributes of the elements)
  * API cleanups, removing backward compatibility 
@@ -14,8 +14,10 @@ please see the EmeraldTree repository:
 
    http://hg.moinmo.in/EmeraldTree/
 
+Please note: EmeraldTree works with Python 2.4 (or later).
+
 Changes are (c) by their authors (see also source files) and licensed
-under the same BSD license as ElementTree (see below):
+under the same Python (MIT style) license as ElementTree (see below):
  * Bastian Blank <bblank@thinkmo.de>
 
 
