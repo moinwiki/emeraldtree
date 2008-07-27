@@ -54,6 +54,7 @@
 # The ElementTree toolkit is
 #
 # Copyright (c) 1999-2007 by Fredrik Lundh
+#               2008 Bastian Blank <bblank@thinkmo.de>
 #
 # By obtaining, using, and/or copying this software and/or its
 # associated documentation, you agree that you have read, understood,
@@ -674,6 +675,8 @@ class ElementTree(object):
         write = file.write
         if not method:
             method = "xml"
+        elif method == 'html':
+            default_namespace = "http://www.w3.org/1999/xhtml"
         if not encoding:
             encoding = "us-ascii"
         elif xml_declaration or (xml_declaration is None and
@@ -819,65 +822,63 @@ def _serialize_xml(write, elem, encoding, qnames, namespaces):
     else:
         write(_escape_cdata(unicode(elem), encoding))
 
-HTML_EMPTY = ("area", "base", "basefont", "br", "col", "frame", "hr",
-              "img", "input", "isindex", "link", "meta" "param")
-
-try:
-    HTML_EMPTY = set(HTML_EMPTY)
-except NameError:
-    pass
+HTML_EMPTY = set(("area", "base", "basefont", "br", "col", "frame", "hr",
+                  "img", "input", "isindex", "link", "meta" "param"))
 
 def _serialize_html(write, elem, encoding, qnames, namespaces):
-    tag = elem.tag
-    text = elem.text
-    if tag is Comment:
-        write("<!--%s-->" % _escape_cdata(text, encoding))
-    elif tag is ProcessingInstruction:
-        write("<?%s?>" % _escape_cdata(text, encoding))
-    else:
-        tag = qnames[tag]
-        if tag is None:
-            if text:
-                write(_escape_cdata(text, encoding))
-            for e in elem:
-                _serialize_html(write, e, encoding, qnames, None)
-        else:
+    if isinstance(elem, Element):
+        tag = qnames[elem.tag]
+
+        if tag is not None:
             write("<" + tag)
-            items = elem.items()
-            if items or namespaces:
-                items.sort() # lexical order
+
+            if elem.attrib:
+                items = elem.attrib.items()
+                items.sort(key=lambda x: x[0])
                 for k, v in items:
-                    if isinstance(k, QName):
-                        k = k.text
+                    k = qnames[k]
                     if isinstance(v, QName):
-                        v = qnames[v.text]
+                        v = qnames[v]
                     else:
-                        v = _escape_attrib_html(v, encoding)
+                        v = _escape_attrib(v, encoding)
                     # FIXME: handle boolean attributes
-                    write(" %s=\"%s\"" % (qnames[k], v))
-                if namespaces:
-                    items = namespaces.items()
-                    items.sort(key=lambda x: x[1]) # sort on prefix
-                    for v, k in items:
-                        if k:
-                            k = ":" + k
-                        write(" xmlns%s=\"%s\"" % (
-                            k.encode(encoding),
-                            _escape_attrib(v, encoding)
-                            ))
+                    write(' ' + k + '="' + v + '"')
+            if namespaces:
+                items = namespaces.items()
+                items.sort(key=lambda x: x[1]) # sort on prefix
+                for v, k in items:
+                    if k:
+                        k = ":" + k
+                    write(" xmlns%s=\"%s\"" % (
+                        k.encode(encoding),
+                        _escape_attrib(v, encoding)
+                        ))
             write(">")
-            tag = tag.lower()
-            if text:
-                if tag == "script" or tag == "style":
-                    write(_encode(text, encoding))
-                else:
-                    write(_escape_cdata(text, encoding))
-            for e in elem:
-                _serialize_html(write, e, encoding, qnames, None)
+
+            if tag.lower() in ('script', 'style'):
+                write(_encode(''.join(elem.itertext()), encoding))
+            else:
+                for e in elem:
+                    _serialize_html(write, e, encoding, qnames, None)
+
             if tag not in HTML_EMPTY:
                 write("</" + tag + ">")
-    if elem.tail:
-        write(_escape_cdata(elem.tail, encoding))
+
+        else:
+            for e in elem:
+                _serialize_html(write, e, encoding, qnames, None)
+
+    elif isinstance(elem, Comment):
+        write("<!--%s-->" % _escape_cdata(elem.text, encoding))
+
+    elif isinstance(elem, ProcessingInstruction):
+        text = _escape_cdata(elem.target, encoding)
+        if elem.text is not None:
+            text += ' ' + _escape_cdata(elem.text, encoding)
+        write("<?%s?>" % text)
+
+    else:
+        write(_escape_cdata(elem, encoding))
 
 def _serialize_text(write, elem, encoding):
     for part in elem.itertext():
@@ -958,19 +959,6 @@ def _escape_attrib(text, encoding):
             text = text.replace("\"", "&quot;")
         if "\n" in text:
             text = text.replace("\n", "&#10;")
-        return text.encode(encoding, "xmlcharrefreplace")
-    except (TypeError, AttributeError):
-        _raise_serialization_error(text)
-
-def _escape_attrib_html(text, encoding):
-    # escape attribute value
-    try:
-        if "&" in text:
-            text = text.replace("&", "&amp;")
-        if ">" in text:
-            text = text.replace(">", "&gt;")
-        if "\"" in text:
-            text = text.replace("\"", "&quot;")
         return text.encode(encoding, "xmlcharrefreplace")
     except (TypeError, AttributeError):
         _raise_serialization_error(text)
