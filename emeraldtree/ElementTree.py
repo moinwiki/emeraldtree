@@ -189,7 +189,7 @@ class Element(Node):
         attrib.update(extra)
         self.tag = tag
         self.attrib = attrib
-        self._children = list(children)
+        self._children = [self._check_node(i) for i in children]
 
     def __repr__(self):
         return "<Element %s at %x>" % (repr(self.tag), id(self))
