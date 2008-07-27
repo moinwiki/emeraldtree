@@ -883,8 +883,6 @@ def _serialize_html(write, elem, encoding, qnames, namespaces):
 def _serialize_text(write, elem, encoding):
     for part in elem.itertext():
         write(part.encode(encoding))
-    if elem.tail:
-        write(elem.tail.encode(encoding))
 
 ##
 # Registers a namespace prefix.  The registry is global, and any
