@@ -19,7 +19,7 @@
 # utility.
 ##
 
-import glob, string, os, sys
+import glob, os, sys
 
 from ElementTree import ElementTree, Element
 
@@ -40,13 +40,13 @@ def tidy(file, new_inline_tags=None):
 
     if new_inline_tags:
         command.append("--new-inline-tags")
-        command.append(string.join(new_inline_tags, ","))
+        command.append(",".join(new_inline_tags))
 
     # FIXME: support more tidy options!
 
     # convert
     os.system(
-        "%s %s >%s.out 2>%s.err" % (string.join(command), file, file, file)
+        "%s %s >%s.out 2>%s.err" % (" ".join(command), file, file, file)
         )
     # check that the result is valid XML
     try:
@@ -110,9 +110,9 @@ def getzonebody(file, **options):
     if body is None:
         return
 
-    if body.text and string.strip(body.text):
+    if body.text and body.text.strip():
         title = Element("h1")
-        title.text = string.strip(body.text)
+        title.text = body.text.strip()
         title.tail = "\n\n"
         body.insert(0, title)
 

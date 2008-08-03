@@ -87,39 +87,28 @@
 # </pre>
 ##
 
-import re, sys, string
+import re
 
-try:
-    unicode("")
-except NameError:
-    def encode(s, encoding):
-        # 1.5.2: application must use the right encoding
-        return s
-    _escape = re.compile(r"[&<>\"\x80-\xff]+") # 1.5.2
-else:
-    def encode(s, encoding):
-        return s.encode(encoding)
-    _escape = re.compile(eval(r'u"[&<>\"\u0080-\uffff]+"'))
+def encode(s, encoding):
+    return s.encode(encoding)
 
-def encode_entity(text, pattern=_escape):
+def encode_entity(text, pattern=re.compile(ur'[&<>"\u0080-\uffff]+')):
     # map reserved and non-ascii characters to numerical entities
     def escape_entities(m):
         out = []
         for char in m.group():
             out.append("&#%d;" % ord(char))
-        return string.join(out, "")
+        return "".join(out)
     return encode(pattern.sub(escape_entities, text), "ascii")
-
-del _escape
 
 #
 # the following functions assume an ascii-compatible encoding
 # (or "utf-16")
 
-def escape_cdata(s, encoding=None, replace=string.replace):
-    s = replace(s, "&", "&amp;")
-    s = replace(s, "<", "&lt;")
-    s = replace(s, ">", "&gt;")
+def escape_cdata(s, encoding=None):
+    s = s.replace("&", "&amp;")
+    s = s.replace("<", "&lt;")
+    s = s.replace(">", "&gt;")
     if encoding:
         try:
             return encode(s, encoding)
@@ -127,12 +116,12 @@ def escape_cdata(s, encoding=None, replace=string.replace):
             return encode_entity(s)
     return s
 
-def escape_attrib(s, encoding=None, replace=string.replace):
-    s = replace(s, "&", "&amp;")
-    s = replace(s, "'", "&apos;")
-    s = replace(s, "\"", "&quot;")
-    s = replace(s, "<", "&lt;")
-    s = replace(s, ">", "&gt;")
+def escape_attrib(s, encoding=None):
+    s = s.replace("&", "&amp;")
+    s = s.replace("'", "&apos;")
+    s = s.replace('"', "&quot;")
+    s = s.replace("<", "&lt;")
+    s = s.replace(">", "&gt;")
     if encoding:
         try:
             return encode(s, encoding)
@@ -166,7 +155,7 @@ class XMLWriter:
             self.__write(">")
             self.__open = 0
         if self.__data:
-            data = string.join(self.__data, "")
+            data = "".join(self.__data)
             self.__write(escape_cdata(data, self.__encoding))
             self.__data = []
 
