@@ -1286,13 +1286,9 @@ class XMLParser(object):
         try:
             from xml.parsers import expat
         except ImportError:
-            try:
-                import pyexpat
-                expat = pyexpat
-            except ImportError:
-                raise ImportError(
-                    "No module named expat; use SimpleXMLTreeBuilder instead"
-                    )
+            raise ImportError(
+                "No module named expat; use SimpleXMLTreeBuilder instead"
+                )
         parser = expat.ParserCreate(encoding, "}")
         if target is None:
             target = TreeBuilder()

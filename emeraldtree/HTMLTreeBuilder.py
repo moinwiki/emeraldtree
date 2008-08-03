@@ -50,31 +50,17 @@
 ##
 
 import htmlentitydefs
-import re, string, sys
+import re
 import mimetools, StringIO
+from HTMLParser import HTMLParser
 
 import ElementTree
 
 AUTOCLOSE = "p", "li", "tr", "th", "td", "head", "body"
 IGNOREEND = "img", "hr", "meta", "link", "br"
 
-if sys.version[:3] == "1.5":
-    is_not_ascii = re.compile(r"[\x80-\xff]").search # 1.5.2
-else:
-    is_not_ascii = re.compile(eval(r'u"[\u0080-\uffff]"')).search
+is_not_ascii = re.compile(eval(r'u"[\u0080-\uffff]"')).search
 
-try:
-    from HTMLParser import HTMLParser
-except ImportError:
-    from sgmllib import SGMLParser
-    # hack to use sgmllib's SGMLParser to emulate 2.2's HTMLParser
-    class HTMLParser(SGMLParser):
-        # the following only works as long as this class doesn't
-        # provide any do, start, or end handlers
-        def unknown_starttag(self, tag, attrs):
-            self.handle_starttag(tag, attrs)
-        def unknown_endtag(self, tag):
-            self.handle_endtag(tag)
 
 ##
 # ElementTree builder for HTML source code.  This builder converts an
@@ -127,7 +113,7 @@ class HTMLTreeBuilder(HTMLParser):
             http_equiv = content = None
             for k, v in attrs:
                 if k == "http-equiv":
-                    http_equiv = string.lower(v)
+                    http_equiv = v.lower()
                 elif k == "content":
                     content = v
             if http_equiv == "content-type" and content:
@@ -145,7 +131,7 @@ class HTMLTreeBuilder(HTMLParser):
         attrib = {}
         if attrs:
             for k, v in attrs:
-                attrib[string.lower(k)] = v
+                attrib[k.lower()] = v
         self.__builder.start(tag, attrib)
         if tag in IGNOREEND:
             self.__stack.pop()
