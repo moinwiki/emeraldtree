@@ -739,12 +739,7 @@ def _namespaces(elem, encoding, default_namespace, namespaces):
                 else:
                     qnames[qname] = encode(qname.name)
             else:
-                if default_namespace:
-                    # FIXME: can this be handled in XML 1.0?
-                    raise ValueError(
-                        "cannot use non-qualified names with "
-                        "default_namespace option"
-                        )
+                # XXX: What happens with undefined namespace?
                 qnames[qname] = encode(qname.name)
         except TypeError:
             _raise_serialization_error(qname)
