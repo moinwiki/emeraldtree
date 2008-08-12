@@ -15,9 +15,9 @@ def test_Element():
     assert elem.tag == 'a'
 
 def test_Element__len__():
-    elem = Element('a', children = range(10))
+    elem = Element('a', children=['1', '2', '3', '4', '5'])
 
-    assert len(elem) == 10
+    assert len(elem) == 5
 
 def test_Element__nonzero__():
     elem = Element('a')
@@ -109,7 +109,7 @@ def test_Element_findtext():
 def test_Element_findall():
     child_1 = Element('b1')
     child_2 = Element('b2')
-    child_3 = "text"
+    child_3 = u"text"
     elem = Element('a', children=[child_1, child_2, child_3])
 
     result = list(elem.findall('b1'))
@@ -261,13 +261,13 @@ def test_XMLParser_namespace():
     assert elem.tag == QName('b', 'c')
     assert elem.attrib == {QName('d', None): 'e'}
     assert serialize(elem) == '<ns0:b d="e" xmlns:ns0="c" />'
-    assert serialize(elem, default_namespace='c') == '<ns0:b d="e" xmlns:ns0="c" />'
+    assert serialize(elem, default_namespace='c') == '<b d="e" xmlns="c" />'
 
     elem = XML('<a:b xmlns:a="c" d="e" a:f="g"/>')
     assert isinstance(elem.tag, QName)
     assert elem.tag == QName('b', 'c')
     assert elem.attrib == {'d': 'e', QName('f', 'c'): 'g'}
     assert serialize(elem) == '<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
-    assert serialize(elem, default_namespace='c') == '<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
+    assert serialize(elem, default_namespace='c') == '<b d="e" f="g" xmlns="c" />'
 
 
