@@ -185,7 +185,13 @@ class Element(Node):
         raise RuntimeError('The tail argument is not supported')
 
     def __init__(self, tag, attrib=None, children=(), **extra):
-        attrib = attrib and attrib.copy() or {}
+        if attrib:
+            if isinstance(attrib, dict):
+                attrib = attrib.copy()
+            else:
+                raise TypeError('attrib')
+        else:
+            attrib = {}
         attrib.update(extra)
         self.tag = tag
         self.attrib = attrib
@@ -495,6 +501,7 @@ class QName(unicode):
             name = name[i + 1:]
 
         if uri is not None:
+            uri = unicode(uri)
             text = '{' + uri + '}' + name
 
         ret = unicode.__new__(cls, text)
