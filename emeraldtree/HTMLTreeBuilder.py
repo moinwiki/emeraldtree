@@ -52,14 +52,9 @@
 import htmlentitydefs
 import re
 import mimetools, StringIO
-from HTMLParser import HTMLParser
+from HTMLParser import HTMLParser as HTMLParserBase
 
 import ElementTree
-
-AUTOCLOSE = "p", "li", "tr", "th", "td", "head", "body"
-IGNOREEND = "img", "hr", "meta", "link", "br"
-
-is_not_ascii = re.compile(eval(r'u"[\u0080-\uffff]"')).search
 
 
 ##
@@ -83,9 +78,11 @@ is_not_ascii = re.compile(eval(r'u"[\u0080-\uffff]"')).search
 #
 # @see elementtree.ElementTree
 
-class HTMLTreeBuilder(HTMLParser):
+class HTMLParser(HTMLParserBase):
+    AUTOCLOSE = "p", "li", "tr", "th", "td", "head", "body"
+    IGNOREEND = "img", "hr", "meta", "link", "br", "input", "col"
 
-    # FIXME: shouldn't this class be named Parser, not Builder?
+    namespace = "http://www.w3.org/1999/xhtml"
 
     def __init__(self, builder=None, encoding=None):
         self.__stack = []
@@ -93,7 +90,7 @@ class HTMLTreeBuilder(HTMLParser):
             builder = ElementTree.TreeBuilder()
         self.__builder = builder
         self.encoding = encoding or "iso-8859-1"
-        HTMLParser.__init__(self)
+        HTMLParserBase.__init__(self)
 
     ##
     # Flushes parser buffers, and return the root element.
@@ -101,14 +98,15 @@ class HTMLTreeBuilder(HTMLParser):
     # @return An Element instance.
 
     def close(self):
-        HTMLParser.close(self)
+        HTMLParserBase.close(self)
         return self.__builder.close()
 
     ##
     # (Internal) Handles start tags.
 
     def handle_starttag(self, tag, attrs):
-        if tag == "meta":
+        tag = ElementTree.QName(tag.lower(), self.namespace)
+        if tag.name == "meta":
             # look for encoding directives
             http_equiv = content = None
             for k, v in attrs:
@@ -124,16 +122,20 @@ class HTMLTreeBuilder(HTMLParser):
                 encoding = header.getparam("charset")
                 if encoding:
                     self.encoding = encoding
-        if tag in AUTOCLOSE:
+        if tag.name in self.AUTOCLOSE:
             if self.__stack and self.__stack[-1] == tag:
                 self.handle_endtag(tag)
         self.__stack.append(tag)
         attrib = {}
         if attrs:
-            for k, v in attrs:
-                attrib[k.lower()] = v
+            for key, value in attrs:
+                # Handle short attributes
+                if value is None:
+                    value = key
+                key = ElementTree.QName(key.lower(), self.namespace)
+                attrib[key] = value
         self.__builder.start(tag, attrib)
-        if tag in IGNOREEND:
+        if tag.name in self.IGNOREEND:
             self.__stack.pop()
             self.__builder.end(tag)
 
@@ -141,10 +143,12 @@ class HTMLTreeBuilder(HTMLParser):
     # (Internal) Handles end tags.
 
     def handle_endtag(self, tag):
-        if tag in IGNOREEND:
+        if not isinstance(tag, ElementTree.QName):
+            tag = ElementTree.QName(tag.lower(), self.namespace)
+        if tag.name in self.IGNOREEND:
             return
         lasttag = self.__stack.pop()
-        if tag != lasttag and lasttag in AUTOCLOSE:
+        if tag != lasttag and lasttag.name in self.AUTOCLOSE:
             self.handle_endtag(lasttag)
         self.__builder.end(tag)
 
@@ -182,7 +186,7 @@ class HTMLTreeBuilder(HTMLParser):
     # (Internal) Handles character data.
 
     def handle_data(self, data):
-        if isinstance(data, type('')) and is_not_ascii(data):
+        if isinstance(data, str):
             # convert to unicode, but only if necessary
             data = unicode(data, self.encoding, "ignore")
         self.__builder.data(data)
@@ -195,9 +199,9 @@ class HTMLTreeBuilder(HTMLParser):
         pass # ignore by default; override if necessary
 
 ##
-# An alias for the <b>HTMLTreeBuilder</b> class.
+# An alias for the <b>HTMLParser</b> class.
 
-TreeBuilder = HTMLTreeBuilder
+TreeBuilder = HTMLTreeBuilder = HTMLParser
 
 ##
 # Parse an HTML document or document fragment.
@@ -210,6 +214,11 @@ TreeBuilder = HTMLTreeBuilder
 
 def parse(source, encoding=None):
     return ElementTree.parse(source, HTMLTreeBuilder(encoding=encoding))
+
+def HTML(text):
+    parser = HTMLParser()
+    parser.feed(text)
+    return parser.close()
 
 if __name__ == "__main__":
     import sys
