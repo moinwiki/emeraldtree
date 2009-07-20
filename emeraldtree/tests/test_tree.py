@@ -1,5 +1,5 @@
 import py.test
-from emeraldtree.ElementTree import *
+from emeraldtree.tree import *
 
 def serialize(elem, **options):
     from cStringIO import StringIO
