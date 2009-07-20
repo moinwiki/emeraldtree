@@ -1,11 +1,10 @@
 import py.test
 from emeraldtree.tree import *
 
-def serialize(elem, **options):
-    from cStringIO import StringIO
+def serialize(elem, namespaces={}):
+    from StringIO import StringIO
     file = StringIO()
-    tree = ElementTree(elem)
-    tree.write(file, **options)
+    XMLWriter(namespaces=namespaces).write(file.write, elem)
     return file.getvalue()
 
 def test_Element():
@@ -255,19 +254,20 @@ def test_XMLParser_text2():
     assert elem[1].tag == 'c'
     assert elem[2] == 'd'
 
-def test_XMLParser_namespace():
+def test_XMLParser_namespace_1():
     elem = XML('<b xmlns="c" d="e"/>')
     assert isinstance(elem.tag, QName)
     assert elem.tag == QName('b', 'c')
     assert elem.attrib == {QName('d', None): 'e'}
     assert serialize(elem) == '<ns0:b d="e" xmlns:ns0="c" />'
-    assert serialize(elem, default_namespace='c') == '<b d="e" xmlns="c" />'
+    assert serialize(elem, namespaces={'c': ''}) == '<b d="e" xmlns="c" />'
 
+def test_XMLParser_namespace_2():
     elem = XML('<a:b xmlns:a="c" d="e" a:f="g"/>')
     assert isinstance(elem.tag, QName)
     assert elem.tag == QName('b', 'c')
     assert elem.attrib == {'d': 'e', QName('f', 'c'): 'g'}
     assert serialize(elem) == '<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
-    assert serialize(elem, default_namespace='c') == '<b d="e" f="g" xmlns="c" />'
+    assert serialize(elem, namespaces={'c': ''}) == '<b d="e" f="g" xmlns="c" />'
 
 
