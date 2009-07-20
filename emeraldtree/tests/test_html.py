@@ -1,6 +1,6 @@
 import py.test
 from emeraldtree.ElementTree import *
-from emeraldtree.HTMLTreeBuilder import *
+from emeraldtree.html import *
 
 def serialize(elem, **options):
     from cStringIO import StringIO
@@ -14,14 +14,14 @@ def test_HTMLParser_simple1():
     assert elem.tag.name == 'a'
     assert len(elem) == 0
 
-def test_XMLParser_simple2():
+def test_HTMLParser_simple2():
     elem = HTML('<a><b /></a>')
     assert elem.tag.name == 'a'
     assert len(elem) == 1
     assert elem[0].tag.name == 'b'
     assert len(elem[0]) == 0
 
-def test_XMLParser_text1():
+def test_HTMLParser_text1():
     elem = HTML('<a>b</a>')
     assert elem.tag.name == 'a'
     assert isinstance(elem, Element)
@@ -29,7 +29,7 @@ def test_XMLParser_text1():
     assert elem[0] == 'b'
     assert isinstance(elem[0], unicode)
 
-def test_XMLParser_text2():
+def test_HTMLParser_text2():
     elem = HTML('<a>b<c>d</c>d</a>')
     assert elem.tag.name == 'a'
     assert len(elem) == 3

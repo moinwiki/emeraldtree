@@ -1,26 +1,8 @@
 #
-# ElementTree
-# $Id: HTMLTreeBuilder.py 3265 2007-09-06 20:42:00Z fredrik $
-#
-# a simple tree builder, for HTML input
-#
-# history:
-# 2002-04-06 fl   created
-# 2002-04-07 fl   ignore IMG and HR end tags
-# 2002-04-07 fl   added support for 1.5.2 and later
-# 2003-04-13 fl   added HTMLTreeBuilder alias
-# 2004-12-02 fl   don't feed non-ASCII charrefs/entities as 8-bit strings
-# 2004-12-05 fl   don't feed non-ASCII CDATA as 8-bit strings
-#
-# Copyright (c) 1999-2004 by Fredrik Lundh.  All rights reserved.
-#
-# fredrik@pythonware.com
-# http://www.pythonware.com
-#
-# --------------------------------------------------------------------
 # The ElementTree toolkit is
 #
 # Copyright (c) 1999-2007 by Fredrik Lundh
+#               2008-2009 Bastian Blank <bblank@thinkmo.de>
 #
 # By obtaining, using, and/or copying this software and/or its
 # associated documentation, you agree that you have read, understood,
@@ -84,7 +66,7 @@ class HTMLParser(HTMLParserBase):
 
     namespace = "http://www.w3.org/1999/xhtml"
 
-    def __init__(self, builder=None, encoding=None):
+    def __init__(self, encoding=None, builder=None):
         self.__stack = []
         if builder is None:
             builder = ElementTree.TreeBuilder()
@@ -197,11 +179,6 @@ class HTMLParser(HTMLParserBase):
 
     def unknown_entityref(self, name):
         pass # ignore by default; override if necessary
-
-##
-# An alias for the <b>HTMLParser</b> class.
-
-TreeBuilder = HTMLTreeBuilder = HTMLParser
 
 ##
 # Parse an HTML document or document fragment.
