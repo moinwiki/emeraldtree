@@ -370,6 +370,17 @@ class Element(Node):
             elif isinstance(e, basestring):
                 yield e
 
+    def write(self, write, encoding=None, namespaces={}, method=None):
+        if not method or method == "xml":
+            Writer = XMLWriter
+        elif method == "html":
+            Writer = HTMLWriter
+        else:
+            Writer = TextWriter
+
+        Writer(encoding, namespaces).write(write, self)
+
+
 ##
 # Subelement factory.  This function creates an element instance, and
 # appends it to an existing element.
@@ -1319,7 +1330,7 @@ class HTMLWriter(BaseWriter):
 
     def __init__(self, encoding=None, namespaces={}):
         namespaces["http://www.w3.org/1999/xhtml"] = ''
-        super(HTTPWriter, self).__init__(encoding, namespaces)
+        super(HTMLWriter, self).__init__(encoding, namespaces)
 
     def serialize(self, write, elem, qnames, namespaces={}):
         if isinstance(elem, Element):
@@ -1355,14 +1366,14 @@ class HTMLWriter(BaseWriter):
                     write(self._encode(''.join(elem.itertext())))
                 else:
                     for e in elem:
-                        self.serialize(write, e, encoding, qnames)
+                        self.serialize(write, e, qnames)
 
-                if tag not in HTML_EMPTY:
+                if tag not in self.empty_elements:
                     write("</" + tag + ">")
 
             else:
                 for e in elem:
-                    self.serialize(write, e, encoding, qnames)
+                    self.serialize(write, e, qnames)
 
         elif isinstance(elem, Comment):
             write("<!--%s-->" % self._escape_cdata(elem.text))
