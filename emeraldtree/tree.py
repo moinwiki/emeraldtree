@@ -476,13 +476,7 @@ class QName(unicode):
 
     def __setattr__(self, key, value):
         raise AttributeError('read-only')
-
-    def copy(self):
-        return self.__class__(self.name, self.uri)
-
-    @property
-    def text(self):
-        return self
+    __delattr__ = __setattr__
 
 # --------------------------------------------------------------------
 
@@ -1060,7 +1054,7 @@ class XMLParser(object):
     def _fixname(self, key):
         # expand qname, and convert name string to ascii, if possible
         if key in self._names:
-            return self._names[key].copy()
+            return self._names[key]
         if '}' in key:
             uri, name = key.split('}', 1)
             name = QName(name, uri)
