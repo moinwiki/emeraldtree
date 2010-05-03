@@ -321,21 +321,18 @@ def test_QName___init__():
     assert qname.uri is None
     assert qname.name == u'a'
     assert isinstance(qname.name, unicode)
-    assert str(qname) == u'a'
-    assert qname.text == u'a'
+    assert unicode(qname) == u'a'
 
     qname = QName(u'{b}a')
     assert qname.uri == u'b'
     assert isinstance(qname.uri, unicode)
     assert qname.name == u'a'
-    assert str(qname) == u'{b}a'
-    assert qname.text == u'{b}a'
+    assert unicode(qname) == u'{b}a'
 
     qname = QName(u'a', u'b')
     assert qname.uri == u'b'
     assert qname.name == u'a'
-    assert str(qname) == u'{b}a'
-    assert qname.text == u'{b}a'
+    assert unicode(qname) == u'{b}a'
 
     py.test.raises(ValueError, QName, u'{bau')
     py.test.raises(ValueError, QName, u'{b}a', u'c')
