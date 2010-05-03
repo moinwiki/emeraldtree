@@ -434,13 +434,16 @@ class ProcessingInstruction(Node):
 
 PI = ProcessingInstruction
 
-##
-# QName wrapper.  This can be used to wrap a QName attribute value, in
-# order to get proper namespace handling on output.
-#
-# @return An opaque object, representing the QName.
-
 class QName(unicode):
+    """
+    QName wrapper.  This can be used to wrap a QName attribute value, in
+    order to get proper namespace handling on output.
+
+    @ivar name: local part of the QName
+    @type name: unicode
+    @ivar uri: URI part of the QName
+    @type uri: unicode
+    """
     __slots__ = 'name', 'uri'
 
     def __new__(cls, name, uri=None):
