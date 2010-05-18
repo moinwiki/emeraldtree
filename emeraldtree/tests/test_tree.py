@@ -218,10 +218,19 @@ def test_Element_findall_attribute():
     b2 = Element(u'b')
     a1 = Element(u'a', children=(b1, b2, ))
 
+    result = list(b1.findall(u"c[@testattr]"))
+    # note: does not work without c, like b1.findall(u"[@testattr]") - should it?
+    assert len(result) == 1
+    assert result[0] is c2
+
     result = list(b1.findall(u"c[@testattr='testvalue']"))
     # note: does not work without c, like b1.findall(u"[@testattr='testvalue']") - should it?
     assert len(result) == 1
     assert result[0] is c2
+
+    result = list(b1.findall(u"c[@testattr='othervalue']"))
+    # note: does not work without c, like b1.findall(u"[@testattr='othervalue']") - should it?
+    assert len(result) == 0
 
 def test_Element_findall_position():
     py.test.skip('not supported')
