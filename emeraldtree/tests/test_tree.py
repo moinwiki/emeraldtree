@@ -210,6 +210,36 @@ def test_Element_findall_dotslashslash():
     assert result[0] is c1
     assert result[1] is c2
 
+def test_Element_findall_attribute():
+    c1 = Element(u'c')
+    c2 = Element(u'c', testattr='testvalue')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    result = list(b1.findall(u"c[@testattr='testvalue']"))
+    # note: does not work without c, like b1.findall(u"[@testattr='testvalue']") - should it?
+    assert len(result) == 1
+    assert result[0] is c2
+
+def test_Element_findall_position():
+    py.test.skip('not supported')
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    result = list(b1.findall(u'c[1]')) # note: index is 1-based, [1] (not [0]) is first
+    assert len(result) == 1
+    assert result[0] is c1
+
+    result = list(b1.findall(u'c[2]'))
+    assert len(result) == 1
+    assert result[0] is c2
+
 def test_Element_findtext_default():
     elem = Element(u'a')
     default_text = u'defaulttext'
