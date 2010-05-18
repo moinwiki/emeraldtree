@@ -130,6 +130,86 @@ def test_Element_findall():
     assert len(result) == 1
     assert result[0] is child_1
 
+def test_Element_findall_tag_multimatch():
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    result = list(b1.findall(u'c'))
+    assert len(result) == 2
+    assert result[0] is c1
+    assert result[1] is c2
+
+    result = list(a1.findall(u'c'))
+    assert len(result) == 0 # no 'c' childs
+
+    result = list(a1.findall(u'*/c'))
+    assert len(result) == 2 # but 2 'c' grandchilds
+    assert result[0] is c1
+    assert result[1] is c2
+
+def test_Element_findall_bracketed_tag():
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    result = list(b1.findall(u'[c]'))
+    assert len(result) == 1
+    assert result[0] is b1 # b1 has 'c' childs
+
+    result = list(a1.findall(u'*/[c]'))
+    assert len(result) == 1
+    assert result[0] is b1 # b1 has 'c' childs
+
+def test_Element_findall_dotdot():
+    py.test.skip('broken')
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+    
+    result = list(c1.findall(u'../c'))
+    assert len(result) == 2
+    assert result[0] is c1
+    assert result[1] is c2
+
+def test_Element_findall_slashslash():
+    py.test.skip('broken')
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    a1t = ElementTree(element=a1) # we need a tree to use //
+    result = list(a1t.findall(u'//c'))
+    assert len(result) == 2
+    assert result[0] is c1
+    assert result[1] is c2
+
+def test_Element_findall_dotslashslash():
+    py.test.skip('broken')
+    c1 = Element(u'c')
+    c2 = Element(u'c')
+    text = u"text"
+    b1 = Element(u'b', children=(c1, text, c2))
+    b2 = Element(u'b')
+    a1 = Element(u'a', children=(b1, b2, ))
+
+    result = list(a1.findall(u'.//c'))
+    assert len(result) == 2
+    assert result[0] is c1
+    assert result[1] is c2
+
 def test_Element_findtext_default():
     elem = Element(u'a')
     default_text = u'defaulttext'
