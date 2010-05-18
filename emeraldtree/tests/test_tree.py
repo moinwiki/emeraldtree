@@ -102,19 +102,6 @@ def test_Element_find():
     result = elem.find(u'{url1}b1')
     assert result is child_1
 
-def test_Element_findtext_default():
-    elem = Element(u'a')
-    default_text = u'defaulttext'
-    result = elem.findtext(u'b', default=default_text)
-    assert result is default_text
-
-def test_Element_findtext():
-    child_text = u"text"
-    child = Element(u'b', children=(child_text, ))
-    elem = Element(u'a', children=(child, ))
-    result = elem.findtext(u'b')
-    assert result is child_text
-
 def test_Element_findall():
     child_1 = Element(u'b1')
     child_2 = Element(u'b2')
@@ -142,6 +129,19 @@ def test_Element_findall():
     result = list(elem.findall(u'{url1}b1'))
     assert len(result) == 1
     assert result[0] is child_1
+
+def test_Element_findtext_default():
+    elem = Element(u'a')
+    default_text = u'defaulttext'
+    result = elem.findtext(u'doesnotexist', default=default_text)
+    assert result is default_text
+
+def test_Element_findtext():
+    child_text = u"text"
+    child = Element(u'b', children=(child_text, ))
+    elem = Element(u'a', children=(child, ))
+    result = elem.findtext(u'b')
+    assert result is child_text
 
 def test_Element_clear():
     pass
