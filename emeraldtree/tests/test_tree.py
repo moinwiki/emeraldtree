@@ -4,7 +4,7 @@ from emeraldtree.tree import *
 def serialize(elem, namespaces={}):
     from StringIO import StringIO
     file = StringIO()
-    XMLWriter(namespaces=namespaces).write(file.write, elem)
+    elem.write(file.write, namespaces=namespaces)
     return file.getvalue()
 
 def test_Element():
