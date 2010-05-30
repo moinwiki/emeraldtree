@@ -650,44 +650,6 @@ class ElementTree(object):
 # --------------------------------------------------------------------
 # serialization support
 
-##
-# Registers a namespace prefix.  The registry is global, and any
-# existing mapping for either the given prefix or the namespace URI
-# will be removed.
-#
-# @param prefix Namespace prefix.
-# @param uri Namespace uri.  Tags and attributes in this namespace
-#     will be serialized with the given prefix, if at all possible.
-# @raise ValueError If the prefix is reserved, or is otherwise
-#     invalid.
-
-def register_namespace(prefix, uri):
-    import re
-    if re.match("ns\d+$", prefix):
-        raise ValueError("Prefix format reserved for internal use")
-    for k, v in _namespace_map.items():
-        if k == uri or v == prefix:
-            del _namespace_map[k]
-    _namespace_map[uri] = prefix
-
-_namespace_map = {
-    # "well-known" namespace prefixes
-    "http://www.w3.org/XML/1998/namespace": "xml",
-    "http://www.w3.org/1999/xhtml": "html",
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
-    "http://schemas.xmlsoap.org/wsdl/": "wsdl",
-    # xml schema
-    "http://www.w3.org/2001/XMLSchema": "xs",
-    "http://www.w3.org/2001/XMLSchema-instance": "xsi",
-    # dublic core
-    "http://purl.org/dc/elements/1.1/": "dc",
-}
-
-def _raise_serialization_error(text):
-    raise TypeError(
-        "cannot serialize %r (type %s)" % (text, type(text).__name__)
-        )
-
 # --------------------------------------------------------------------
 
 ##
@@ -1197,7 +1159,7 @@ class BaseWriter(object):
         qnames = {None: None}
 
         # maps uri:s to prefixes
-        candidate_namespaces = _namespace_map.copy()
+        candidate_namespaces = self._namespace_map.copy()
         candidate_namespaces = {}
         candidate_namespaces.update(self.namespaces)
         used_namespaces = {}
@@ -1225,7 +1187,7 @@ class BaseWriter(object):
                     # XXX: What happens with undefined namespace?
                     qnames[qname] = qname.name
             except TypeError:
-                _raise_serialization_error(qname)
+                self._raise_serialization_error(qname)
 
         # populate qname and namespaces table
         if isinstance(elem, Element):
@@ -1237,7 +1199,7 @@ class BaseWriter(object):
                     elif isinstance(tag, basestring):
                         add_qname(QName(tag))
                     elif tag is not None:
-                        _raise_serialization_error(tag)
+                        self._raise_serialization_error(tag)
 
                     for key in elem.keys():
                         if isinstance(key, QName):
@@ -1245,9 +1207,49 @@ class BaseWriter(object):
                         elif isinstance(key, basestring):
                             add_qname(QName(key))
                         elif key is not None:
-                            _raise_serialization_error(key)
+                            self._raise_serialization_error(key)
 
         return qnames, used_namespaces
+
+    @staticmethod
+    def _raise_serialization_error(text):
+        raise TypeError(
+            "cannot serialize %r (type %s)" % (text, type(text).__name__)
+            )
+
+    ##
+    # Registers a namespace prefix.  The registry is global, and any
+    # existing mapping for either the given prefix or the namespace URI
+    # will be removed.
+    #
+    # @param prefix Namespace prefix.
+    # @param uri Namespace uri.  Tags and attributes in this namespace
+    #     will be serialized with the given prefix, if at all possible.
+    # @raise ValueError If the prefix is reserved, or is otherwise
+    #     invalid.
+
+    @classmethod
+    def register_namespace(cls, prefix, uri):
+        import re
+        if re.match("ns\d+$", prefix):
+            raise ValueError("Prefix format reserved for internal use")
+        for k, v in cls._namespace_map.items():
+            if k == uri or v == prefix:
+                del _namespace_map[k]
+        cls._namespace_map[uri] = prefix
+
+    _namespace_map = {
+        # "well-known" namespace prefixes
+        "http://www.w3.org/XML/1998/namespace": "xml",
+        "http://www.w3.org/1999/xhtml": "html",
+        "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
+        "http://schemas.xmlsoap.org/wsdl/": "wsdl",
+        # xml schema
+        "http://www.w3.org/2001/XMLSchema": "xs",
+        "http://www.w3.org/2001/XMLSchema-instance": "xsi",
+        # dublic core
+        "http://purl.org/dc/elements/1.1/": "dc",
+    }
 
     def serialize_start(self, write):
         pass
