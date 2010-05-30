@@ -77,6 +77,17 @@ class Node(object):
     Node class.
     """
 
+    def write(self, write, encoding=None, namespaces={}, method=None):
+        if not method or method == "xml":
+            Writer = XMLWriter
+        elif method == "html":
+            Writer = HTMLWriter
+        else:
+            Writer = TextWriter
+
+        Writer(encoding, namespaces).write(write, self)
+
+
 ##
 # Element class.  This class defines the Element interface, and
 # provides a reference implementation of this interface.
@@ -369,16 +380,6 @@ class Element(Node):
                     yield s
             elif isinstance(e, basestring):
                 yield e
-
-    def write(self, write, encoding=None, namespaces={}, method=None):
-        if not method or method == "xml":
-            Writer = XMLWriter
-        elif method == "html":
-            Writer = HTMLWriter
-        else:
-            Writer = TextWriter
-
-        Writer(encoding, namespaces).write(write, self)
 
 
 ##
