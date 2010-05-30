@@ -2,7 +2,7 @@
 # The ElementTree toolkit is
 #
 # Copyright (c) 1999-2007 by Fredrik Lundh
-#               2008-2009 Bastian Blank <bblank@thinkmo.de>
+#               2008-2010 Bastian Blank <bblank@thinkmo.de>
 #
 # By obtaining, using, and/or copying this software and/or its
 # associated documentation, you agree that you have read, understood,
@@ -36,7 +36,7 @@ import re
 import mimetools, StringIO
 from HTMLParser import HTMLParser as HTMLParserBase
 
-import ElementTree
+from . import tree
 
 
 ##
@@ -67,12 +67,10 @@ class HTMLParser(HTMLParserBase):
     namespace = "http://www.w3.org/1999/xhtml"
 
     def __init__(self, encoding=None, builder=None):
-        self.__stack = []
-        if builder is None:
-            builder = ElementTree.TreeBuilder()
-        self.__builder = builder
-        self.encoding = encoding or "iso-8859-1"
         HTMLParserBase.__init__(self)
+        self.__stack = []
+        self.__builder = builder or tree.TreeBuilder()
+        self.encoding = encoding or "iso-8859-1"
 
     ##
     # Flushes parser buffers, and return the root element.
@@ -87,7 +85,7 @@ class HTMLParser(HTMLParserBase):
     # (Internal) Handles start tags.
 
     def handle_starttag(self, tag, attrs):
-        tag = ElementTree.QName(tag.lower(), self.namespace)
+        tag = tree.QName(tag.lower(), self.namespace)
         if tag.name == "meta":
             # look for encoding directives
             http_equiv = content = None
@@ -114,7 +112,7 @@ class HTMLParser(HTMLParserBase):
                 # Handle short attributes
                 if value is None:
                     value = key
-                key = ElementTree.QName(key.lower(), self.namespace)
+                key = tree.QName(key.lower(), self.namespace)
                 attrib[key] = value
         self.__builder.start(tag, attrib)
         if tag.name in self.IGNOREEND:
@@ -125,8 +123,8 @@ class HTMLParser(HTMLParserBase):
     # (Internal) Handles end tags.
 
     def handle_endtag(self, tag):
-        if not isinstance(tag, ElementTree.QName):
-            tag = ElementTree.QName(tag.lower(), self.namespace)
+        if not isinstance(tag, tree.QName):
+            tag = tree.QName(tag.lower(), self.namespace)
         if tag.name in self.IGNOREEND:
             return
         lasttag = self.__stack.pop()

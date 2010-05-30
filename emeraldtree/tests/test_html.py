@@ -1,6 +1,6 @@
 import py.test
-from emeraldtree.ElementTree import *
-from emeraldtree.html import *
+
+from .. import html, tree
 
 def serialize(elem, **options):
     from cStringIO import StringIO
@@ -10,27 +10,27 @@ def serialize(elem, **options):
     return file.getvalue()
 
 def test_HTMLParser_simple1():
-    elem = HTML('<a></a>')
+    elem = html.HTML('<a></a>')
     assert elem.tag.name == 'a'
     assert len(elem) == 0
 
 def test_HTMLParser_simple2():
-    elem = HTML('<a><b /></a>')
+    elem = html.HTML('<a><b /></a>')
     assert elem.tag.name == 'a'
     assert len(elem) == 1
     assert elem[0].tag.name == 'b'
     assert len(elem[0]) == 0
 
 def test_HTMLParser_text1():
-    elem = HTML('<a>b</a>')
+    elem = html.HTML('<a>b</a>')
     assert elem.tag.name == 'a'
-    assert isinstance(elem, Element)
+    assert isinstance(elem, tree.Element)
     assert len(elem) == 1
     assert elem[0] == 'b'
     assert isinstance(elem[0], unicode)
 
 def test_HTMLParser_text2():
-    elem = HTML('<a>b<c>d</c>d</a>')
+    elem = html.HTML('<a>b<c>d</c>d</a>')
     assert elem.tag.name == 'a'
     assert len(elem) == 3
     assert elem[0] == 'b'
@@ -38,11 +38,11 @@ def test_HTMLParser_text2():
     assert elem[2] == 'd'
 
 def test_HTMLParser_ignoreend():
-    elem = HTML('<br>')
+    elem = html.HTML('<br>')
     assert elem.tag.name == 'br'
     assert len(elem) == 0
 
-    elem = HTML('<br></br>')
+    elem = html.HTML('<br></br>')
     assert elem.tag.name == 'br'
     assert len(elem) == 0
 
