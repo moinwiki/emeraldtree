@@ -32,8 +32,6 @@
 ##
 
 import htmlentitydefs
-import re
-import mimetools, StringIO
 from HTMLParser import HTMLParser as HTMLParserBase
 
 from . import tree
@@ -96,6 +94,7 @@ class HTMLParser(HTMLParserBase):
                     content = v
             if http_equiv == "content-type" and content:
                 # use mimetools to parse the http header
+                import mimetools, StringIO
                 header = mimetools.Message(
                     StringIO.StringIO("%s: %s\n\n" % (http_equiv, content))
                     )
