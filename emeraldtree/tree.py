@@ -635,18 +635,12 @@ class ElementTree(object):
         write = file.write
         if not encoding:
             encoding = "us-ascii"
-        if not method or method == "xml":
-            Writer = XMLWriter
-        elif method == "html":
-            Writer = HTMLWriter
-        else:
-            Writer = TextWriter
 
         if default_namespace:
             namespaces = namespaces.copy()
             namespaces[default_namespace] = ''
 
-        Writer(encoding, namespaces).write(write, self._root)
+        self._root.write(write, encoding=encoding, namespaces=namespaces, method=method)
 
 # --------------------------------------------------------------------
 # serialization support
