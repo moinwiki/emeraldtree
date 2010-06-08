@@ -150,7 +150,7 @@ class Element(Node):
         attrib.update(extra)
         self.tag = tag
         self.attrib = attrib
-        self._children = [self._check_node(i) for i in children]
+        self._children = list(children)
 
     def __repr__(self):
         return "<Element %s at %x>" % (repr(self.tag), id(self))
@@ -185,10 +185,6 @@ class Element(Node):
     # @exception AssertionError If element is not a valid object.
 
     def __setitem__(self, index, element):
-        if isinstance(index, slice):
-            element = [self._check_node(i) for i in element]
-        else:
-            element = self._check_node(element)
         self._children.__setitem__(index, element)
 
     ##
@@ -200,14 +196,6 @@ class Element(Node):
     def __delitem__(self, index):
         self._children.__delitem__(index)
 
-    @staticmethod
-    def _check_node(node):
-        if isinstance(node, (Node, unicode)):
-            return node
-        if isinstance(node, str):
-            return unicode(node)
-        raise TypeError
-
     ##
     # Adds a subelement to the end of this element.
     #
@@ -215,7 +203,6 @@ class Element(Node):
     # @exception AssertionError If a sequence member is not a valid object.
 
     def append(self, element):
-        element = self._check_node(element)
         self._children.append(element)
 
     ##
@@ -226,7 +213,6 @@ class Element(Node):
     # @since 1.3
 
     def extend(self, elements):
-        elements = [self._check_node(i) for i in elements]
         self._children.extend(elements)
 
     ##
@@ -236,7 +222,6 @@ class Element(Node):
     # @exception AssertionError If the element is not a valid object.
 
     def insert(self, index, element):
-        element = self._check_node(element)
         self._children.insert(index, element)
 
     ##
