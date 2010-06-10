@@ -374,6 +374,17 @@ class Element(Node):
             if child.__class__ is Element:
                 yield child
 
+    def iter_elements_tree(self):
+        """
+        Creates an interator over all elements in document order.
+        """
+        work = [(self ,)]
+        while work:
+            cur = work.pop()
+            for i in cur:
+                yield i
+                work.append(i.iter_elements())
+
 
 ##
 # Subelement factory.  This function creates an element instance, and
@@ -1178,24 +1189,23 @@ class BaseWriter(object):
                 self._raise_serialization_error(qname)
 
         # populate qname and namespaces table
-        if isinstance(elem, Element):
-            for elem in elem.iter():
-                if isinstance(elem, Element):
-                    tag = elem.tag
-                    if isinstance(tag, QName):
-                        add_qname(tag)
-                    elif isinstance(tag, basestring):
-                        add_qname(QName(tag))
-                    elif tag is not None:
-                        self._raise_serialization_error(tag)
+        if elem.__class__ is Element:
+            for elem in elem.iter_elements_tree():
+                tag = elem.tag
+                if isinstance(tag, QName):
+                    add_qname(tag)
+                elif isinstance(tag, basestring):
+                    add_qname(QName(tag))
+                elif tag is not None:
+                    self._raise_serialization_error(tag)
 
-                    for key in elem.keys():
-                        if isinstance(key, QName):
-                            add_qname(key)
-                        elif isinstance(key, basestring):
-                            add_qname(QName(key))
-                        elif key is not None:
-                            self._raise_serialization_error(key)
+                for key in elem.attrib.iterkeys():
+                    if isinstance(key, QName):
+                        add_qname(key)
+                    elif isinstance(key, basestring):
+                        add_qname(QName(key))
+                    elif key is not None:
+                        self._raise_serialization_error(key)
 
         return qnames, used_namespaces
 
