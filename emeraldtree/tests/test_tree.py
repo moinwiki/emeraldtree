@@ -303,6 +303,16 @@ def test_Element_itertext():
     l = list(elem.itertext())
     assert len(l) == 1
 
+def test_Element_iter_elements():
+    elem = Element(u'a')
+    assert len(list(elem.iter_elements())) == 0
+
+    elem.append(Element(u'c'))
+    assert len(list(elem.iter_elements())) == 1
+
+    elem.append(u'b')
+    assert len(list(elem.iter_elements())) == 1
+
 def test_Comment():
     elem = Comment(u'a')
     assert serialize(elem) == u'<!--a-->'
