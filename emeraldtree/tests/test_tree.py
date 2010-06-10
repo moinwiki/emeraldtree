@@ -313,6 +313,19 @@ def test_Element_iter_elements():
     elem.append(u'b')
     assert len(list(elem.iter_elements())) == 1
 
+def test_Element_iter_elements_tree():
+    elem = Element(u'a')
+    assert len(list(elem.iter_elements_tree())) == 1
+
+    elem.append(u'b')
+    assert len(list(elem.iter_elements_tree())) == 1
+
+    elem.append(Element(u'c'))
+    assert len(list(elem.iter_elements_tree())) == 2
+
+    elem.append(u'd')
+    assert len(list(elem.iter_elements_tree())) == 2
+
 def test_Comment():
     elem = Comment(u'a')
     assert serialize(elem) == u'<!--a-->'
