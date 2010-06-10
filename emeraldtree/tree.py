@@ -366,6 +366,14 @@ class Element(Node):
             elif isinstance(e, basestring):
                 yield e
 
+    def iter_elements(self):
+        """
+        Creates an interator over all direct element children.
+        """
+        for child in self._children:
+            if child.__class__ is Element:
+                yield child
+
 
 ##
 # Subelement factory.  This function creates an element instance, and
