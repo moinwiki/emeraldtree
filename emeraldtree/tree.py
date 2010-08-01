@@ -237,6 +237,12 @@ class Element(Node):
         self._children.remove(element)
 
     ##
+    # Removes all subelements.
+
+    def remove_all(self):
+        self._children = []
+
+    ##
     # Finds the first matching subelement, by tag name or path.
     #
     # @param path What element to look for.
@@ -277,7 +283,7 @@ class Element(Node):
 
     def clear(self):
         self.attrib.clear()
-        self._children = []
+        self.remove_all()
 
     ##
     # Gets an element attribute.
