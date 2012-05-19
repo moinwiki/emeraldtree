@@ -1272,45 +1272,58 @@ class TextWriter(BaseWriter):
             write(part)
 
 
-class XMLWriter(BaseWriter):
+class MLBaseWriter(BaseWriter):
+    """stuff HTML / XML writers have in common"""
+    def _attrib_string(self, d, qnames):
+        """create a attribute string from a dict d"""
+        if not d:
+            return u''
+        items = d.items()
+        items.sort(key=lambda x: x[0])
+        result = []
+        for k, v in items:
+            k = qnames[k]
+            if isinstance(v, QName):
+                v = qnames[v]
+            else:
+                v = self._escape_attrib(unicode(v))
+            # FIXME: handle boolean attributes for HTML
+            result.append(u' %s="%s"' % (k, v))
+        return u''.join(result)
+
+    def _namespace_string(self, d):
+        """create a namespace string from a dict d"""
+        if not d:
+            return u''
+        items = d.items()
+        items.sort(key=lambda x: x[1]) # sort on prefix
+        result = []
+        for v, k in items:
+            if k:
+                k = u':' + k
+            result.append(u' xmlns%s="%s"' % (k, self._escape_attrib(v)))
+        return u''.join(result)
+
+
+class XMLWriter(MLBaseWriter):
     def serialize(self, write, elem, qnames, namespaces={}):
         if isinstance(elem, Element):
             tag = qnames[elem.tag]
 
             if tag is not None:
-                write(u"<" + tag)
-
-                if elem.attrib:
-                    items = elem.attrib.items()
-                    items.sort(key=lambda x: x[0])
-                    for k, v in items:
-                        k = qnames[k]
-                        if isinstance(v, QName):
-                            v = qnames[v]
-                        else:
-                            v = self._escape_attrib(unicode(v))
-                        write(u' ' + k + u'="' + v + u'"')
-                if namespaces:
-                    items = namespaces.items()
-                    items.sort(key=lambda x: x[1]) # sort on prefix
-                    for v, k in items:
-                        if k:
-                            k = u":" + k
-                        write(u" xmlns%s=\"%s\"" % (
-                            k,
-                            self._escape_attrib(v)
-                            ))
+                attrib_str = self._attrib_string(elem.attrib, qnames)
+                namespace_str = self._namespace_string(namespaces)
                 if len(elem):
-                    write(u">")
+                    write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
                     for e in elem:
                         self.serialize(write, e, qnames)
-                    write(u"</" + tag + u">")
+                    write(u"</%s>" % tag)
                 else:
-                    write(u" />")
+                    write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
 
             else:
                 for e in elem:
-                    self.serialize(write, e, encoding, qnames)
+                    self.serialize(write, e, qnames)
 
         elif isinstance(elem, Comment):
             write(u"<!--%s-->" % self._escape_cdata(elem.text))
@@ -1329,7 +1342,7 @@ class XMLWriter(BaseWriter):
             write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
 
 
-class HTMLWriter(BaseWriter):
+class HTMLWriter(MLBaseWriter):
     empty_elements = frozenset(("area", "base", "basefont", "br", "col", "frame", "hr",
                                 "img", "input", "isindex", "link", "meta" "param"))
 
@@ -1342,39 +1355,16 @@ class HTMLWriter(BaseWriter):
             tag = qnames[elem.tag]
 
             if tag is not None:
-                write(u"<" + tag)
-
-                if elem.attrib:
-                    items = elem.attrib.items()
-                    items.sort(key=lambda x: x[0])
-                    for k, v in items:
-                        k = qnames[k]
-                        if isinstance(v, QName):
-                            v = qnames[v]
-                        else:
-                            v = self._escape_attrib(unicode(v))
-                        # FIXME: handle boolean attributes
-                        write(u' ' + k + u'="' + v + u'"')
-                if namespaces:
-                    items = namespaces.items()
-                    items.sort(key=lambda x: x[1]) # sort on prefix
-                    for v, k in items:
-                        if k:
-                            k = u":" + k
-                        write(u" xmlns%s=\"%s\"" % (
-                            k,
-                            self._escape_attrib(v)
-                            ))
-                write(u">")
-
+                attrib_str = self._attrib_string(elem.attrib, qnames)
+                namespace_str = self._namespace_string(namespaces)
+                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
                 if tag.lower() in ('script', 'style'):
                     write(u''.join(elem.itertext()))
                 else:
                     for e in elem:
                         self.serialize(write, e, qnames)
-
                 if tag not in self.empty_elements:
-                    write(u"</" + tag + u">")
+                    write(u"</%s>" % tag)
 
             else:
                 for e in elem:
