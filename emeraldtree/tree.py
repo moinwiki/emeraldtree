@@ -1304,38 +1304,50 @@ class MLBaseWriter(BaseWriter):
             result.append(u' xmlns%s="%s"' % (k, self._escape_attrib(v)))
         return u''.join(result)
 
+    def _serialize_element(self, write, elem, qnames, namespaces):
+        raise NotImplementedError
 
-class XMLWriter(MLBaseWriter):
+    def _serialize_comment(self, write, elem):
+        write(u"<!--%s-->" % self._escape_cdata(elem.text))
+
+    def _serialize_pi(self, write, elem):
+        text = self._escape_cdata(elem.target)
+        if elem.text is not None:
+            text += ' ' + self._escape_cdata(elem.text)
+        write(u"<?%s?>" % text)
+
+    def _serialize_cdata(self, write, elem):
+        write(self._escape_cdata(unicode(elem)))
+
     def serialize(self, write, elem, qnames, namespaces={}):
         if isinstance(elem, Element):
-            tag = qnames[elem.tag]
+            self._serialize_element(write, elem, qnames, namespaces)
+        elif isinstance(elem, Comment):
+            self._serialize_comment(write, elem)
+        elif isinstance(elem, ProcessingInstruction):
+            self._serialize_pi(write, elem)
+        else:
+            self._serialize_cdata(write, elem)
 
-            if tag is not None:
-                attrib_str = self._attrib_string(elem.attrib, qnames)
-                namespace_str = self._namespace_string(namespaces)
-                if len(elem):
-                    write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
-                    for e in elem:
-                        self.serialize(write, e, qnames)
-                    write(u"</%s>" % tag)
-                else:
-                    write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
 
-            else:
+class XMLWriter(MLBaseWriter):
+    def _serialize_element(self, write, elem, qnames, namespaces):
+        tag = qnames[elem.tag]
+
+        if tag is not None:
+            attrib_str = self._attrib_string(elem.attrib, qnames)
+            namespace_str = self._namespace_string(namespaces)
+            if len(elem):
+                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
                 for e in elem:
                     self.serialize(write, e, qnames)
-
-        elif isinstance(elem, Comment):
-            write(u"<!--%s-->" % self._escape_cdata(elem.text))
-
-        elif isinstance(elem, ProcessingInstruction):
-            text = self._escape_cdata(elem.target)
-            if elem.text is not None:
-                text += ' ' + self._escape_cdata(elem.text)
-            write(u"<?%s?>" % text)
+                write(u"</%s>" % tag)
+            else:
+                write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
 
         else:
-            write(self._escape_cdata(unicode(elem)))
+            for e in elem:
+                self.serialize(write, e, qnames)
 
     def serialize_start(self, write):
         if self.encoding and self.encoding not in ("utf-8", "us-ascii"):
@@ -1350,35 +1362,22 @@ class HTMLWriter(MLBaseWriter):
         namespaces["http://www.w3.org/1999/xhtml"] = ''
         super(HTMLWriter, self).__init__(encoding, namespaces)
 
-    def serialize(self, write, elem, qnames, namespaces={}):
-        if isinstance(elem, Element):
-            tag = qnames[elem.tag]
+    def _serialize_element(self, write, elem, qnames, namespaces):
+        tag = qnames[elem.tag]
 
-            if tag is not None:
-                attrib_str = self._attrib_string(elem.attrib, qnames)
-                namespace_str = self._namespace_string(namespaces)
-                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
-                if tag.lower() in ('script', 'style'):
-                    write(u''.join(elem.itertext()))
-                else:
-                    for e in elem:
-                        self.serialize(write, e, qnames)
-                if tag not in self.empty_elements:
-                    write(u"</%s>" % tag)
-
+        if tag is not None:
+            attrib_str = self._attrib_string(elem.attrib, qnames)
+            namespace_str = self._namespace_string(namespaces)
+            write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
+            if tag.lower() in ('script', 'style'):
+                write(u''.join(elem.itertext()))
             else:
                 for e in elem:
                     self.serialize(write, e, qnames)
-
-        elif isinstance(elem, Comment):
-            write(u"<!--%s-->" % self._escape_cdata(elem.text))
-
-        elif isinstance(elem, ProcessingInstruction):
-            text = self._escape_cdata(elem.target)
-            if elem.text is not None:
-                text += ' ' + self._escape_cdata(elem.text)
-            write(u"<?%s?>" % text)
+            if tag not in self.empty_elements:
+                write(u"</%s>" % tag)
 
         else:
-            write(self._escape_cdata(unicode(elem)))
+            for e in elem:
+                self.serialize(write, e, qnames)
 
