@@ -14,6 +14,8 @@ EmeraldTree is a fork of ElementTree - the main differences are:
 
 * Better unicode support
 
+* PolyglotWriter (for writing html5 that is also well-formed xml)
+
 * Other improvements / optimizations
 
 The fork happened at ElementTree 1.3a3-20070912-preview.
