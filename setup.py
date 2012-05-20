@@ -35,7 +35,7 @@ setup(
     download_url = "http://static.moinmo.in/files/packages/emeraldtree-0.9.1.tar.gz",
     author="Bastian Blank",
     author_email="bblank@thinkmo.de",
-    keywords=["xml", "html", "element", "tree", "dom", "unicode", ],
+    keywords=["xml", "html", "html5", "polyglot", "element", "tree", "dom", "unicode", ],
     description=DESCRIPTION,
     long_description=__doc__,
     license="Python (MIT style)",
