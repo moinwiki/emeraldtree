@@ -2,10 +2,10 @@ import py.test
 
 from .. import html, tree
 
-def serialize(elem):
+def serialize(elem, method):
     from StringIO import StringIO
     file = StringIO()
-    elem.write(file.write, method='html')
+    elem.write(file.write, method=method)
     return file.getvalue()
 
 def test_read_simple1():
@@ -46,5 +46,11 @@ def test_read_ignoreend():
     assert len(elem) == 0
 
 def test_write():
-    elem = html.HTML(u'<br>')
-    assert serialize(elem) == u'<br>'
+    elem = html.HTML(u'<html><br><p></html>')
+    h = serialize(elem, 'html')
+    p = serialize(elem, 'polyglot')
+    x = serialize(elem, 'xml')
+    assert u'<br><p>' in h
+    assert u'<br /><p></p>' in p
+    assert u'<br /><p />' in x
+

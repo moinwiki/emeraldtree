@@ -82,6 +82,8 @@ class Node(object):
             Writer = XMLWriter
         elif method == "html":
             Writer = HTMLWriter
+        elif method == "polyglot":
+            Writer = PolyglotWriter
         else:
             Writer = TextWriter
 
@@ -1380,4 +1382,39 @@ class HTMLWriter(MLBaseWriter):
         else:
             for e in elem:
                 self.serialize(write, e, qnames)
+
+
+class PolyglotWriter(MLBaseWriter):
+    """write a document that is valid html5 AND well-formed xml,
+       see http://www.w3.org/TR/html-polyglot/ """
+    void_elements = frozenset(('area', 'base', 'br', 'col', 'command', 'embed', 'hr',
+                               'img', 'input', 'keygen', 'link', 'meta', 'param',
+                               'source', 'track', 'wbr'))
+
+    def __init__(self, encoding=None, namespaces={}):
+        namespaces["http://www.w3.org/1999/xhtml"] = ''
+        super(PolyglotWriter, self).__init__(encoding, namespaces)
+
+    def _serialize_element(self, write, elem, qnames, namespaces):
+        tag = qnames[elem.tag]
+
+        if tag is not None:
+            attrib_str = self._attrib_string(elem.attrib, qnames)
+            namespace_str = self._namespace_string(namespaces)
+            if len(elem):
+                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
+                for e in elem:
+                    self.serialize(write, e, qnames)
+                write(u"</%s>" % tag)
+            elif tag in self.void_elements:
+                write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
+            else:
+                write(u"<%s%s%s></%s>" % (tag, attrib_str, namespace_str, tag))
+
+        else:
+            for e in elem:
+                self.serialize(write, e, qnames)
+
+    def serialize_start(self, write):
+        write(u"<!DOCTYPE html>\n")
 
