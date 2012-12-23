@@ -46,11 +46,11 @@ def test_read_ignoreend():
     assert len(elem) == 0
 
 def test_write():
-    elem = html.HTML(u'<html><br><p></html>')
+    elem = html.HTML('<html><br><p></html>')
     h = serialize(elem, 'html')
     p = serialize(elem, 'polyglot')
     x = serialize(elem, 'xml')
-    assert u'<br><p>' in h
-    assert u'<br /><p></p>' in p
-    assert u'<br /><p />' in x
+    assert '<br><p>' in h
+    assert '<br /><p></p>' in p
+    assert '<br /><p />' in x
 
