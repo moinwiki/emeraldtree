@@ -1352,8 +1352,9 @@ class XMLWriter(MLBaseWriter):
             for e in elem:
                 self.serialize(write, e, qnames)
 
-    def serialize_dicument_start(self, write):
-        write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
+    def serialize_document_start(self, write):
+        if self.encoding and self.encoding not in ("utf-8", "us-ascii"):
+            write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
 
 
 class HTMLWriter(MLBaseWriter):
