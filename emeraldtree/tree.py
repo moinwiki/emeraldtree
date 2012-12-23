@@ -1231,7 +1231,7 @@ class BaseWriter(object):
             raise ValueError("Prefix format reserved for internal use")
         for k, v in cls._namespace_map.items():
             if k == uri or v == prefix:
-                del _namespace_map[k]
+                del cls._namespace_map[k]
         cls._namespace_map[uri] = prefix
 
     _namespace_map = {
