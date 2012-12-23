@@ -77,7 +77,7 @@ class Node(object):
     Node class.
     """
 
-    def write(self, write, encoding=None, namespaces={}, method=None):
+    def write(self, write, encoding=None, namespaces={}, method=None, document=False):
         if not method or method == "xml":
             Writer = XMLWriter
         elif method == "html":
@@ -87,7 +87,7 @@ class Node(object):
         else:
             Writer = TextWriter
 
-        Writer(encoding, namespaces).write(write, self)
+        Writer(encoding, namespaces).write(write, self, document=document)
 
 
 ##
@@ -652,7 +652,7 @@ class ElementTree(object):
             namespaces = namespaces.copy()
             namespaces[default_namespace] = ''
 
-        self._root.write(write, encoding=encoding, namespaces=namespaces, method=method)
+        self._root.write(write, encoding=encoding, namespaces=namespaces, method=method, document=True)
 
 # --------------------------------------------------------------------
 # serialization support
@@ -1252,10 +1252,10 @@ class BaseWriter(object):
         "http://purl.org/dc/elements/1.1/": "dc",
     }
 
-    def serialize_start(self, write):
+    def serialize_document_start(self, write):
         pass
 
-    def write(self, write, element):
+    def write(self, write, element, document=False):
         qnames, namespaces = self._namespaces(element)
 
         if self.encoding:
@@ -1264,7 +1264,8 @@ class BaseWriter(object):
         else:
             write_encode = write
 
-        self.serialize_start(write_encode)
+        if document:
+            self.serialize_document_start(write_encode)
         self.serialize(write_encode, element, qnames, namespaces)
 
 
@@ -1351,9 +1352,8 @@ class XMLWriter(MLBaseWriter):
             for e in elem:
                 self.serialize(write, e, qnames)
 
-    def serialize_start(self, write):
-        if self.encoding and self.encoding not in ("utf-8", "us-ascii"):
-            write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
+    def serialize_dicument_start(self, write):
+        write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
 
 
 class HTMLWriter(MLBaseWriter):
@@ -1415,6 +1415,6 @@ class PolyglotWriter(MLBaseWriter):
             for e in elem:
                 self.serialize(write, e, qnames)
 
-    def serialize_start(self, write):
+    def serialize_document_start(self, write):
         write(u"<!DOCTYPE html>\n")
 
