@@ -1255,6 +1255,9 @@ class BaseWriter(object):
     def serialize_document_start(self, write):
         pass
 
+    def serialize(self, write, elem, qnames, namespaces={}):
+        raise NotImplementedError
+
     def write(self, write, element, document=False):
         qnames, namespaces = self._namespaces(element)
 
