@@ -811,7 +811,7 @@ class _IterParseIterator(object):
                     self._root = self._parser.close()
                     self._parser = None
             else:
-                self._index = self._index + 1
+                self._index += 1
                 return item
 
     def __iter__(self):
