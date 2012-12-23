@@ -668,12 +668,7 @@ class ElementTree(object):
 # @defreturn string
 
 def tostring(element, encoding=None, method=None):
-    class dummy:
-        pass
-    data = []
-    file = dummy()
-    file.write = data.append
-    ElementTree(element).write(file, encoding, method=method)
+    data = tostringlist(element, encoding, method)
     return "".join(data)
 
 ##
@@ -685,13 +680,13 @@ def tostring(element, encoding=None, method=None):
 # @defreturn sequence
 # @since 1.3
 
-def tostringlist(element, encoding=None):
-    class dummy:
+def tostringlist(element, encoding=None, method=None):
+    class dummy(object):
         pass
     data = []
     file = dummy()
     file.write = data.append
-    ElementTree(element).write(file, encoding)
+    ElementTree(element).write(file, encoding, method=method)
     # FIXME: merge small fragments into larger parts
     return data
 
