@@ -137,4 +137,4 @@ def include(elem, loader=None):
                 )
         else:
             include(e, loader)
-        i = i + 1
+        i += 1
