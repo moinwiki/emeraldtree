@@ -31,10 +31,11 @@
 # Tools to build element trees from HTML files.
 ##
 
-import htmlentitydefs
-from HTMLParser import HTMLParser as HTMLParserBase
-
 from . import tree
+import six
+from six.moves import html_entities
+from six.moves import html_parser
+HTMLParserBase = html_parser.HTMLParser
 
 
 ##
@@ -148,7 +149,7 @@ class HTMLParser(HTMLParserBase):
     # (Internal) Handles entity references.
 
     def handle_entityref(self, name):
-        entity = htmlentitydefs.entitydefs.get(name)
+        entity = html_entities.entitydefs.get(name)
         if entity:
             if len(entity) == 1:
                 entity = ord(entity)
@@ -165,9 +166,9 @@ class HTMLParser(HTMLParserBase):
     # (Internal) Handles character data.
 
     def handle_data(self, data):
-        if isinstance(data, str):
+        if isinstance(data, six.binary_type):
             # convert to unicode, but only if necessary
-            data = unicode(data, self.encoding, "ignore")
+            data = data.decode(self.encoding, "ignore")
         self.__builder.data(data)
 
     ##

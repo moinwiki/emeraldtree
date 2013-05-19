@@ -1,9 +1,10 @@
 import py.test
 
 from .. import html, tree
+import six
+from six import StringIO
 
 def serialize(elem, method):
-    from StringIO import StringIO
     file = StringIO()
     elem.write(file.write, method=method)
     return file.getvalue()
@@ -26,7 +27,7 @@ def test_read_text1():
     assert isinstance(elem, tree.Element)
     assert len(elem) == 1
     assert elem[0] == 'b'
-    assert isinstance(elem[0], unicode)
+    assert isinstance(elem[0], six.text_type)
 
 def test_read_text2():
     elem = html.HTML('<a>b<c>d</c>d</a>')
