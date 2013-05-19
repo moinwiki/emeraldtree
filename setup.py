@@ -30,9 +30,9 @@ DESCRIPTION="EmeraldTree - a light-weight XML object model for Python."
 
 setup(
     name="emeraldtree",
-    version="0.9.2",
+    version="0.10.0",
     url='http://hg.moinmo.in/EmeraldTree/',
-    download_url = "http://static.moinmo.in/files/packages/emeraldtree-0.9.2.tar.gz",
+    download_url = "http://static.moinmo.in/files/packages/emeraldtree-0.10.0.tar.gz",
     author="Bastian Blank",
     author_email="bblank@thinkmo.de",
     keywords=["xml", "html", "html5", "polyglot", "element", "tree", "dom", "unicode", ],
@@ -43,12 +43,15 @@ setup(
         'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'License :: OSI Approved :: Python Software Foundation License',
         'Intended Audience :: Developers',
         'Topic :: Text Processing :: Markup :: HTML',
         'Topic :: Text Processing :: Markup :: XML',
     ],
     packages=["emeraldtree"],
-    platforms="Python 2.4 and later.",
+    install_requires=['six>=1.3.0'],
+    platforms="Python 2.7.x. and >=3.3",
 )
 
