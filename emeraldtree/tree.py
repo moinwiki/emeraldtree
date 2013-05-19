@@ -24,6 +24,7 @@
 # OF THIS SOFTWARE.
 
 from __future__ import generators
+import six
 
 __all__ = [
     # public symbols
@@ -65,7 +66,7 @@ __all__ = [
 # structure, and convert it from and to XML.
 ##
 
-import ElementPath
+from . import ElementPath
 
 class ParseError(SyntaxError):
     pass
@@ -129,7 +130,7 @@ class Element(Node):
 
     @property
     def text(self):
-        if len(self) and isinstance(self[0], basestring):
+        if len(self) and isinstance(self[0], six.string_types):
             return self[0]
 
     ##
@@ -165,8 +166,9 @@ class Element(Node):
     def __len__(self):
         return len(self._children)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
+    __nonzero__ = __bool__
 
     ##
     # Returns the given subelement.
@@ -371,7 +373,7 @@ class Element(Node):
             if isinstance(e, Element):
                 for s in e.itertext():
                     yield s
-            elif isinstance(e, basestring):
+            elif isinstance(e, six.string_types):
                 yield e
 
     def iter_elements(self):
@@ -447,7 +449,7 @@ class ProcessingInstruction(Node):
 
 PI = ProcessingInstruction
 
-class QName(unicode):
+class QName(six.text_type):
     """
     QName wrapper.  This can be used to wrap a QName attribute value, in
     order to get proper namespace handling on output.
@@ -460,7 +462,7 @@ class QName(unicode):
     __slots__ = 'name', 'uri'
 
     def __new__(cls, name, uri=None):
-        text = name = unicode(name)
+        text = name = six.text_type(name)
 
         if name[0] == '{':
             if uri is not None:
@@ -472,12 +474,12 @@ class QName(unicode):
             name = name[i + 1:]
 
         if uri is not None:
-            uri = unicode(uri)
+            uri = six.text_type(uri)
             text = '{' + uri + '}' + name
 
-        ret = unicode.__new__(cls, text)
-        unicode.__setattr__(ret, 'name', name)
-        unicode.__setattr__(ret, 'uri', uri)
+        ret = six.text_type.__new__(cls, text)
+        six.text_type.__setattr__(ret, 'name', name)
+        six.text_type.__setattr__(ret, 'uri', uri)
 
         return ret
 
@@ -1105,7 +1107,7 @@ class XMLParser(object):
     def feed(self, data):
         try:
             self._parser.Parse(data, 0)
-        except self._error, v:
+        except self._error as v:
             self._raiseerror(v)
 
     ##
@@ -1117,7 +1119,7 @@ class XMLParser(object):
     def close(self):
         try:
             self._parser.Parse("", 1) # end of data
-        except self._error, v:
+        except self._error as v:
             self._raiseerror(v)
         tree = self.target.close()
         del self.target, self._parser # get rid of circular references
@@ -1192,15 +1194,15 @@ class BaseWriter(object):
                 tag = elem.tag
                 if isinstance(tag, QName):
                     add_qname(tag)
-                elif isinstance(tag, basestring):
+                elif isinstance(tag, six.string_types):
                     add_qname(QName(tag))
                 elif tag is not None:
                     self._raise_serialization_error(tag)
 
-                for key in elem.attrib.iterkeys():
+                for key in six.iterkeys(elem.attrib):
                     if isinstance(key, QName):
                         add_qname(key)
-                    elif isinstance(key, basestring):
+                    elif isinstance(key, six.string_types):
                         add_qname(QName(key))
                     elif key is not None:
                         self._raise_serialization_error(key)
@@ -1279,15 +1281,14 @@ class MLBaseWriter(BaseWriter):
         """create a attribute string from a dict d"""
         if not d:
             return u''
-        items = d.items()
-        items.sort(key=lambda x: x[0])
+        items = sorted(d.items(), key=lambda x: x[0])
         result = []
         for k, v in items:
             k = qnames[k]
             if isinstance(v, QName):
                 v = qnames[v]
             else:
-                v = self._escape_attrib(unicode(v))
+                v = self._escape_attrib(six.text_type(v))
             # FIXME: handle boolean attributes for HTML
             result.append(u' %s="%s"' % (k, v))
         return u''.join(result)
@@ -1296,8 +1297,7 @@ class MLBaseWriter(BaseWriter):
         """create a namespace string from a dict d"""
         if not d:
             return u''
-        items = d.items()
-        items.sort(key=lambda x: x[1]) # sort on prefix
+        items = sorted(d.items(), key=lambda x: x[1]) # sort on prefix
         result = []
         for v, k in items:
             if k:
@@ -1318,7 +1318,7 @@ class MLBaseWriter(BaseWriter):
         write(u"<?%s?>" % text)
 
     def _serialize_cdata(self, write, elem):
-        write(self._escape_cdata(unicode(elem)))
+        write(self._escape_cdata(six.text_type(elem)))
 
     def serialize(self, write, elem, qnames, namespaces={}):
         if isinstance(elem, Element):

@@ -1,8 +1,9 @@
 import py.test
 from emeraldtree.tree import *
+import six
+from six import StringIO
 
 def serialize(elem, namespaces={}):
-    from StringIO import StringIO
     file = StringIO()
     elem.write(file.write, namespaces=namespaces)
     return file.getvalue()
@@ -343,19 +344,19 @@ def test_QName___init__():
     qname = QName(u'a')
     assert qname.uri is None
     assert qname.name == u'a'
-    assert isinstance(qname.name, unicode)
-    assert unicode(qname) == u'a'
+    assert isinstance(qname.name, six.text_type)
+    assert six.text_type(qname) == u'a'
 
     qname = QName(u'{b}a')
     assert qname.uri == u'b'
-    assert isinstance(qname.uri, unicode)
+    assert isinstance(qname.uri, six.text_type)
     assert qname.name == u'a'
-    assert unicode(qname) == u'{b}a'
+    assert six.text_type(qname) == u'{b}a'
 
     qname = QName(u'a', u'b')
     assert qname.uri == u'b'
     assert qname.name == u'a'
-    assert unicode(qname) == u'{b}a'
+    assert six.text_type(qname) == u'{b}a'
 
     py.test.raises(ValueError, QName, u'{bau')
     py.test.raises(ValueError, QName, u'{b}a', u'c')
@@ -393,7 +394,7 @@ def test_XMLParser_text1():
     assert isinstance(elem, Element)
     assert len(elem) == 1
     assert elem[0] == u'b'
-    assert isinstance(elem[0], unicode)
+    assert isinstance(elem[0], six.text_type)
 
 def test_XMLParser_text2():
     elem = XML(u'<a>b<c>d</c>d</a>')
