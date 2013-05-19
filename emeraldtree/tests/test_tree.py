@@ -419,5 +419,3 @@ def test_XMLParser_namespace_2():
     assert elem.attrib == {u'd': u'e', QName(u'f', u'c'): u'g'}
     assert serialize(elem) == u'<ns0:b d="e" ns0:f="g" xmlns:ns0="c" />'
     assert serialize(elem, namespaces={u'c': u''}) == u'<b d="e" f="g" xmlns="c" />'
-
-
