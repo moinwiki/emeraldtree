@@ -1,8 +1,0 @@
-Metadata-Version: 1.0
-Name: emeraldtree
-Version: undefined
-Summary: EmeraldTree - a light-weight XML object model for Python.
-Author: Bastian Blank
-Author-email: bblank@thinkmo.de
-License: Python (MIT style)
-Platform: Python 2.4 and later.
