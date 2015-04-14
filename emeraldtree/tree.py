@@ -916,7 +916,12 @@ class TreeBuilder(object):
     def _flush(self):
         if self._data:
             text = "".join(self._data)
-            self._elem[-1].append(text)
+            if self._elem:
+                self._elem[-1].append(text)
+            else:
+                # ignore empty lines in input, typically strings like: "\n", "   \n", "\n\n\n", etc.
+                text = text.strip()
+                assert not text, 'Parsing error: cannot append orphan string to prior node.'
             self._data = []
 
     ##
