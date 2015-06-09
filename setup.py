@@ -32,7 +32,6 @@ setup(
     name="emeraldtree",
     version="0.10.0",
     url='http://hg.moinmo.in/EmeraldTree/',
-    download_url = "http://static.moinmo.in/files/packages/emeraldtree-0.10.0.tar.gz",
     author="Bastian Blank",
     author_email="bblank@thinkmo.de",
     keywords=["xml", "html", "html5", "polyglot", "element", "tree", "dom", "unicode", ],
@@ -52,6 +51,6 @@ setup(
     ],
     packages=["emeraldtree"],
     install_requires=['six>=1.3.0'],
-    platforms="Python 2.7.x. and >=3.3",
+    platforms="any",
 )
 
