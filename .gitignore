@@ -1,0 +1,10 @@
+MANIFEST
+build/
+dist/
+.tox/
+.idea/
+.cache/
+.eggs/
+*.egg-info/
+*.pyc
+*.pyo
