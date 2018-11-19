@@ -2,9 +2,9 @@ EmeraldTree, a light-weight toolkit for XML processing
 ======================================================
 
 EmeraldTree is a fork of ElementTree - the main differences are:
- * It has a slightly different API:
-   * Handling of text: it uses unicode objects as children (not as
-   "tail" attributes of the elements)
+
+ * It has a slightly different API for handling of text: it uses
+   unicode objects as children (not as "tail" attributes of the elements)
  * API cleanups, removing backward compatibility 
  * Better unicode support
  * PolyglotWriter (for writing html5 that is also well-formed xml)
