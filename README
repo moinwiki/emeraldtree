@@ -13,7 +13,7 @@ EmeraldTree is a fork of ElementTree - the main differences are:
 The fork happened at ElementTree 1.3a3-20070912-preview, for more details
 please see the repositories:
 
-   http://hg.moinmo.in/EmeraldTree/
+   https://github.com/moinwiki/emeraldtree/
    http://svn.effbot.org/public/elementtree-1.3/
 
 Please note: EmeraldTree works with Python 2.7 or >=3.3.

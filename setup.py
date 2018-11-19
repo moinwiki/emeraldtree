@@ -20,7 +20,7 @@ EmeraldTree is a fork of ElementTree - the main differences are:
 
 The fork happened at ElementTree 1.3a3-20070912-preview.
 
-For more details please see the `EmeraldTree repository <http://hg.moinmo.in/EmeraldTree/>`_.
+For more details please see the `EmeraldTree repository <https://github.com/moinwiki/emeraldtree/>`_.
 
 """
 
@@ -31,7 +31,7 @@ DESCRIPTION="EmeraldTree - a light-weight XML object model for Python."
 setup(
     name="emeraldtree",
     version="0.10.1",
-    url='http://hg.moinmo.in/EmeraldTree/',
+    url='https://github.com/moinwiki/emeraldtree/',
     author="Bastian Blank",
     author_email="bblank@thinkmo.de",
     keywords=["xml", "html", "html5", "polyglot", "element", "tree", "dom", "unicode", ],
