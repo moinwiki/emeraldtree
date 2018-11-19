@@ -3,12 +3,12 @@ EmeraldTree, a light-weight toolkit for XML processing
 
 EmeraldTree is a fork of ElementTree - the main differences are:
 
- * It has a slightly different API for handling of text: it uses
-   unicode objects as children (not as "tail" attributes of the elements)
- * API cleanups, removing backward compatibility 
- * Better unicode support
- * PolyglotWriter (for writing html5 that is also well-formed xml)
- * Other improvements / optimizations
+* It has a slightly different API for handling of text: it uses
+  unicode objects as children (not as "tail" attributes of the elements)
+* API cleanups, removing backward compatibility
+* Better unicode support
+* PolyglotWriter (for writing html5 that is also well-formed xml)
+* Other improvements / optimizations
 
 The fork happened at ElementTree 1.3a3-20070912-preview, for more details
 please see the repositories:
@@ -56,7 +56,7 @@ For a list of changes in this release, see the CHANGES document.
 
 The latest version of this library can be downloaded from:
 
-    http://effbot.org/downloads
+http://effbot.org/downloads
 
 Comments, bug reports, and patches are welcome.  Send them to
 fredrik@pythonware.com.
