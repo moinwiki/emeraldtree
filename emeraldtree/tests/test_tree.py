@@ -1,7 +1,8 @@
-import py.test
-from emeraldtree.tree import *
 import six
 from six import StringIO
+import pytest
+
+from emeraldtree.tree import *
 
 def serialize(elem, namespaces={}):
     file = StringIO()
@@ -169,7 +170,7 @@ def test_Element_findall_bracketed_tag():
     assert result[0] is b1 # b1 has 'c' childs
 
 def test_Element_findall_dotdot():
-    py.test.skip('broken')
+    pytest.skip('broken')
     c1 = Element(u'c')
     c2 = Element(u'c')
     text = u"text"
@@ -183,7 +184,7 @@ def test_Element_findall_dotdot():
     assert result[1] is c2
 
 def test_Element_findall_slashslash():
-    py.test.skip('broken')
+    pytest.skip('broken')
     c1 = Element(u'c')
     c2 = Element(u'c')
     text = u"text"
@@ -198,7 +199,7 @@ def test_Element_findall_slashslash():
     assert result[1] is c2
 
 def test_Element_findall_dotslashslash():
-    py.test.skip('broken')
+    pytest.skip('broken')
     c1 = Element(u'c')
     c2 = Element(u'c')
     text = u"text"
@@ -234,7 +235,7 @@ def test_Element_findall_attribute():
     assert len(result) == 0
 
 def test_Element_findall_position():
-    py.test.skip('not supported')
+    pytest.skip('not supported')
     c1 = Element(u'c')
     c2 = Element(u'c')
     text = u"text"
@@ -358,8 +359,8 @@ def test_QName___init__():
     assert qname.name == u'a'
     assert six.text_type(qname) == u'{b}a'
 
-    py.test.raises(ValueError, QName, u'{bau')
-    py.test.raises(ValueError, QName, u'{b}a', u'c')
+    pytest.raises(ValueError, QName, u'{bau')
+    pytest.raises(ValueError, QName, u'{b}a', u'c')
 
 def test_QName___cmp__():
     qname1 = QName(u'a')

@@ -31,10 +31,12 @@
 # Tools to build element trees from HTML files.
 ##
 
-from . import tree
 import six
 from six.moves import html_entities
 from six.moves import html_parser
+
+from . import tree
+
 HTMLParserBase = html_parser.HTMLParser
 
 
