@@ -50,7 +50,6 @@
 ##
 
 import re
-import six
 
 xpath_tokenizer = re.compile(
     "("

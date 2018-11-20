@@ -1,8 +1,7 @@
-import py.test
-
-from .. import html, tree
 import six
 from six import StringIO
+
+from .. import html, tree
 
 def serialize(elem, method):
     file = StringIO()
