@@ -54,3 +54,10 @@ def test_write():
     assert '<br /><p></p>' in p
     assert '<br /><p />' in x
 
+def test_read_meta():
+    parser = html.HTMLParser()
+    assert parser.encoding == 'iso-8859-1'
+
+    parser.feed('<meta http-equiv="content-type" content="text/html; charset=UTF-8">"')
+    assert parser.encoding == 'UTF-8'
+    parser.close()

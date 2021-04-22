@@ -96,12 +96,9 @@ class HTMLParser(HTMLParserBase):
                 elif k == "content":
                     content = v
             if http_equiv == "content-type" and content:
-                # use mimetools to parse the http header
-                import mimetools, StringIO
-                header = mimetools.Message(
-                    StringIO.StringIO("%s: %s\n\n" % (http_equiv, content))
-                    )
-                encoding = header.getparam("charset")
+                import cgi
+                _, params = cgi.parse_header(content)
+                encoding = params.get('charset')
                 if encoding:
                     self.encoding = encoding
         if tag.name in self.AUTOCLOSE:
