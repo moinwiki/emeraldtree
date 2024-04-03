@@ -30,7 +30,7 @@ license = {text="Python (MIT style)"}
 where = ["."]
 
 [build-system]
-requires = ["setuptools", "wheel", "setuptools_scm[toml]>=1.0"]
+requires = ["setuptools", "wheel", "setuptools_scm[toml]"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
@@ -42,8 +42,6 @@ legacy_tox_ini = """
 envlist = py{39,310,311,312}
 
 [testenv]
-deps =
-    pytest
-    six
+deps = pytest
 commands = pytest -rs --pyargs {posargs:emeraldtree}
 """

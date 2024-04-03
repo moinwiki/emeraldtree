@@ -23,8 +23,6 @@
 # ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
 # OF THIS SOFTWARE.
 
-import six
-
 __all__ = [
     # public symbols
     "Comment",
@@ -129,7 +127,7 @@ class Element(Node):
 
     @property
     def text(self):
-        if len(self) and isinstance(self[0], six.string_types):
+        if len(self) and isinstance(self[0], str):
             return self[0]
 
     ##
@@ -372,7 +370,7 @@ class Element(Node):
             if isinstance(e, Element):
                 for s in e.itertext():
                     yield s
-            elif isinstance(e, six.string_types):
+            elif isinstance(e, str):
                 yield e
 
     def iter_elements(self):
@@ -448,7 +446,7 @@ class ProcessingInstruction(Node):
 
 PI = ProcessingInstruction
 
-class QName(six.text_type):
+class QName(str):
     """
     QName wrapper.  This can be used to wrap a QName attribute value, in
     order to get proper namespace handling on output.
@@ -461,7 +459,7 @@ class QName(six.text_type):
     __slots__ = 'name', 'uri'
 
     def __new__(cls, name, uri=None):
-        text = name = six.text_type(name)
+        text = name = str(name)
 
         if name[0] == '{':
             if uri is not None:
@@ -473,12 +471,12 @@ class QName(six.text_type):
             name = name[i + 1:]
 
         if uri is not None:
-            uri = six.text_type(uri)
+            uri = str(uri)
             text = '{' + uri + '}' + name
 
-        ret = six.text_type.__new__(cls, text)
-        six.text_type.__setattr__(ret, 'name', name)
-        six.text_type.__setattr__(ret, 'uri', uri)
+        ret = str.__new__(cls, text)
+        str.__setattr__(ret, 'name', name)
+        str.__setattr__(ret, 'uri', uri)
 
         return ret
 
@@ -1198,15 +1196,15 @@ class BaseWriter(object):
                 tag = elem.tag
                 if isinstance(tag, QName):
                     add_qname(tag)
-                elif isinstance(tag, six.string_types):
+                elif isinstance(tag, str):
                     add_qname(QName(tag))
                 elif tag is not None:
                     self._raise_serialization_error(tag)
 
-                for key in six.iterkeys(elem.attrib):
+                for key in elem.attrib:
                     if isinstance(key, QName):
                         add_qname(key)
-                    elif isinstance(key, six.string_types):
+                    elif isinstance(key, str):
                         add_qname(QName(key))
                     elif key is not None:
                         self._raise_serialization_error(key)
@@ -1292,7 +1290,7 @@ class MLBaseWriter(BaseWriter):
             if isinstance(v, QName):
                 v = qnames[v]
             else:
-                v = self._escape_attrib(six.text_type(v))
+                v = self._escape_attrib(str(v))
             # FIXME: handle boolean attributes for HTML
             result.append(u' %s="%s"' % (k, v))
         return u''.join(result)
@@ -1322,7 +1320,7 @@ class MLBaseWriter(BaseWriter):
         write(u"<?%s?>" % text)
 
     def _serialize_cdata(self, write, elem):
-        write(self._escape_cdata(six.text_type(elem)))
+        write(self._escape_cdata(str(elem)))
 
     def serialize(self, write, elem, qnames, namespaces={}):
         if isinstance(elem, Element):

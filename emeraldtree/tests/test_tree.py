@@ -1,5 +1,5 @@
-import six
-from six import StringIO
+from io import StringIO
+
 import pytest
 
 from emeraldtree.tree import *
@@ -345,19 +345,19 @@ def test_QName___init__():
     qname = QName(u'a')
     assert qname.uri is None
     assert qname.name == u'a'
-    assert isinstance(qname.name, six.text_type)
-    assert six.text_type(qname) == u'a'
+    assert isinstance(qname.name, str)
+    assert str(qname) == u'a'
 
     qname = QName(u'{b}a')
     assert qname.uri == u'b'
-    assert isinstance(qname.uri, six.text_type)
+    assert isinstance(qname.uri, str)
     assert qname.name == u'a'
-    assert six.text_type(qname) == u'{b}a'
+    assert str(qname) == u'{b}a'
 
     qname = QName(u'a', u'b')
     assert qname.uri == u'b'
     assert qname.name == u'a'
-    assert six.text_type(qname) == u'{b}a'
+    assert str(qname) == u'{b}a'
 
     pytest.raises(ValueError, QName, u'{bau')
     pytest.raises(ValueError, QName, u'{b}a', u'c')
@@ -395,7 +395,7 @@ def test_XMLParser_text1():
     assert isinstance(elem, Element)
     assert len(elem) == 1
     assert elem[0] == u'b'
-    assert isinstance(elem[0], six.text_type)
+    assert isinstance(elem[0], str)
 
 def test_XMLParser_text2():
     elem = XML(u'<a>b<c>d</c>d</a>')
