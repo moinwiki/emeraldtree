@@ -1,0 +1,49 @@
+[project]
+dynamic = ["version"]
+name = "emeraldtree"
+readme = "README.rst"
+authors = [{name="Bastian Blank", email="bblank@thinkmo.de"}, ]
+maintainers = [{name="Thomas Waldmann", email="tw@waldmann-edv.de"}, ]
+description = "EmeraldTree - a light-weight XML object model for Python."
+requires-python = ">=3.9"
+keywords = ["xml", "html", "html5", "polyglot", "element", "tree", "dom", "unicode"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Python Software Foundation License",
+    "Intended Audience :: Developers",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Topic :: Text Processing :: Markup :: XML",
+]
+license = {text="Python (MIT style)"}
+
+[project.urls]
+"Homepage" = "https://github.com/moinwiki/emeraldtree"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm[toml]>=1.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "emeraldtree/_version.py"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{39,310,311,312}
+
+[testenv]
+deps =
+    pytest
+    six
+commands = pytest -rs --pyargs {posargs:emeraldtree}
+"""
