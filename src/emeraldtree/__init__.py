@@ -1,3 +1,9 @@
+# EmeraldTree is a fork of ElementTree.
+
+from ._version import *
+
+# Original copyright note from ElementTree:
+
 # $Id: __init__.py 3265 2007-09-06 20:42:00Z fredrik $
 # elementtree package
 

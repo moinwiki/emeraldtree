@@ -8,4 +8,4 @@ dist/
 *.egg-info/
 *.pyc
 *.pyo
-emeraldtree/_version.py
+src/emeraldtree/_version.py

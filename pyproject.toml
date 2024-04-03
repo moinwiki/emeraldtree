@@ -27,14 +27,14 @@ license = {text="Python (MIT style)"}
 "Homepage" = "https://github.com/moinwiki/emeraldtree"
 
 [tool.setuptools.packages.find]
-where = ["."]
+where = ["src"]
 
 [build-system]
 requires = ["setuptools", "wheel", "setuptools_scm[toml]"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
-write_to = "emeraldtree/_version.py"
+write_to = "src/emeraldtree/_version.py"
 
 [tool.tox]
 legacy_tox_ini = """
