@@ -70,7 +70,7 @@ class ParseError(SyntaxError):
 
 # --------------------------------------------------------------------
 
-class Node(object):
+class Node:
     """
     Node class.
     """
@@ -153,7 +153,7 @@ class Element(Node):
         self._children = list(children)
 
     def __repr__(self):
-        return "<Element %s at %x>" % (repr(self.tag), id(self))
+        return "<Element {} at {:x}>".format(repr(self.tag), id(self))
 
     ##
     # Returns the number of subelements.
@@ -368,8 +368,7 @@ class Element(Node):
     def itertext(self):
         for e in self:
             if isinstance(e, Element):
-                for s in e.itertext():
-                    yield s
+                yield from e.itertext()
             elif isinstance(e, str):
                 yield e
 
@@ -487,7 +486,7 @@ class QName(str):
         pass
 
     def __repr__(self):
-        return '%s(%r, %r)' % (self.__class__.__name__, self.name, self.uri)
+        return '{}({!r}, {!r})'.format(self.__class__.__name__, self.name, self.uri)
 
     def __setattr__(self, key, value):
         raise AttributeError('read-only')
@@ -504,7 +503,7 @@ class QName(str):
 # @keyparam file Optional file handle or file name.  If given, the
 #     tree is initialized with the contents of this XML file.
 
-class ElementTree(object):
+class ElementTree:
 
     def __init__(self, element=None, file=None):
         assert element is None or isinstance(element, Node)
@@ -680,7 +679,7 @@ def tostring(element, encoding=None, method=None):
 # @since 1.3
 
 def tostringlist(element, encoding=None, method=None):
-    class dummy(object):
+    class dummy:
         pass
     data = []
     file = dummy()
@@ -742,7 +741,7 @@ def iterparse(source, events=None, parser=None):
         parser = XMLParser(target=TreeBuilder())
     return _IterParseIterator(source, events, parser)
 
-class _IterParseIterator(object):
+class _IterParseIterator:
 
     def __init__(self, source, events, parser):
         self._file = source
@@ -889,7 +888,7 @@ def fromstringlist(sequence, parser=None):
 # @param element_factory Optional element factory.  This factory
 #    is called to create new Element instances, as necessary.
 
-class TreeBuilder(object):
+class TreeBuilder:
 
     def __init__(self, element_factory=None):
         self._data = [] # data collector
@@ -958,7 +957,7 @@ class TreeBuilder(object):
         self._flush()
         self._last = self._elem.pop()
         assert self._last.tag == tag,\
-               "end tag mismatch (expected %s, got %s)" % (
+               "end tag mismatch (expected {}, got {})".format(
                    self._last.tag, tag)
         return self._last
 
@@ -975,7 +974,7 @@ class TreeBuilder(object):
 # @see #ElementTree
 # @see #TreeBuilder
 
-class XMLParser(object):
+class XMLParser:
 
     def __init__(self, html=0, target=None, encoding=None):
         try:
@@ -1127,7 +1126,7 @@ class XMLParser(object):
         del self.target, self._parser # get rid of circular references
         return tree
 
-class BaseWriter(object):
+class BaseWriter:
     def __init__(self, encoding=None, namespaces={}):
         self.encoding = encoding
         self.namespaces = namespaces
@@ -1181,7 +1180,7 @@ class BaseWriter(object):
                         if prefix != "xml":
                             used_namespaces[uri] = prefix
                     if prefix:
-                        qnames[qname] = "%s:%s" % (prefix, qname.name)
+                        qnames[qname] = "{}:{}".format(prefix, qname.name)
                     else:
                         qnames[qname] = qname.name
                 else:
@@ -1214,7 +1213,7 @@ class BaseWriter(object):
     @staticmethod
     def _raise_serialization_error(text):
         raise TypeError(
-            "cannot serialize %r (type %s)" % (text, type(text).__name__)
+            "cannot serialize {!r} (type {})".format(text, type(text).__name__)
             )
 
     ##
@@ -1231,7 +1230,7 @@ class BaseWriter(object):
     @classmethod
     def register_namespace(cls, prefix, uri):
         import re
-        if re.match("ns\d+$", prefix):
+        if re.match(r"ns\d+$", prefix):
             raise ValueError("Prefix format reserved for internal use")
         for k, v in cls._namespace_map.items():
             if k == uri or v == prefix:
@@ -1282,7 +1281,7 @@ class MLBaseWriter(BaseWriter):
     def _attrib_string(self, d, qnames):
         """create a attribute string from a dict d"""
         if not d:
-            return u''
+            return ''
         items = sorted(d.items(), key=lambda x: x[0])
         result = []
         for k, v in items:
@@ -1292,32 +1291,32 @@ class MLBaseWriter(BaseWriter):
             else:
                 v = self._escape_attrib(str(v))
             # FIXME: handle boolean attributes for HTML
-            result.append(u' %s="%s"' % (k, v))
-        return u''.join(result)
+            result.append(' {}="{}"'.format(k, v))
+        return ''.join(result)
 
     def _namespace_string(self, d):
         """create a namespace string from a dict d"""
         if not d:
-            return u''
+            return ''
         items = sorted(d.items(), key=lambda x: x[1]) # sort on prefix
         result = []
         for v, k in items:
             if k:
-                k = u':' + k
-            result.append(u' xmlns%s="%s"' % (k, self._escape_attrib(v)))
-        return u''.join(result)
+                k = ':' + k
+            result.append(' xmlns{}="{}"'.format(k, self._escape_attrib(v)))
+        return ''.join(result)
 
     def _serialize_element(self, write, elem, qnames, namespaces):
         raise NotImplementedError
 
     def _serialize_comment(self, write, elem):
-        write(u"<!--%s-->" % self._escape_cdata(elem.text))
+        write("<!--%s-->" % self._escape_cdata(elem.text))
 
     def _serialize_pi(self, write, elem):
         text = self._escape_cdata(elem.target)
         if elem.text is not None:
             text += ' ' + self._escape_cdata(elem.text)
-        write(u"<?%s?>" % text)
+        write("<?%s?>" % text)
 
     def _serialize_cdata(self, write, elem):
         write(self._escape_cdata(str(elem)))
@@ -1341,12 +1340,12 @@ class XMLWriter(MLBaseWriter):
             attrib_str = self._attrib_string(elem.attrib, qnames)
             namespace_str = self._namespace_string(namespaces)
             if len(elem):
-                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
+                write("<{}{}{}>".format(tag, attrib_str, namespace_str))
                 for e in elem:
                     self.serialize(write, e, qnames)
-                write(u"</%s>" % tag)
+                write("</%s>" % tag)
             else:
-                write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
+                write("<{}{}{} />".format(tag, attrib_str, namespace_str))
 
         else:
             for e in elem:
@@ -1354,7 +1353,7 @@ class XMLWriter(MLBaseWriter):
 
     def serialize_document_start(self, write):
         if self.encoding and self.encoding not in ("utf-8", "us-ascii"):
-            write(u"<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
+            write("<?xml version='1.0' encoding='%s'?>\n" % self.encoding)
 
 
 class HTMLWriter(MLBaseWriter):
@@ -1363,7 +1362,7 @@ class HTMLWriter(MLBaseWriter):
 
     def __init__(self, encoding=None, namespaces={}):
         namespaces["http://www.w3.org/1999/xhtml"] = ''
-        super(HTMLWriter, self).__init__(encoding, namespaces)
+        super().__init__(encoding, namespaces)
 
     def _serialize_element(self, write, elem, qnames, namespaces):
         tag = qnames[elem.tag]
@@ -1371,14 +1370,14 @@ class HTMLWriter(MLBaseWriter):
         if tag is not None:
             attrib_str = self._attrib_string(elem.attrib, qnames)
             namespace_str = self._namespace_string(namespaces)
-            write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
+            write("<{}{}{}>".format(tag, attrib_str, namespace_str))
             if tag.lower() in ('script', 'style'):
-                write(u''.join(elem.itertext()))
+                write(''.join(elem.itertext()))
             else:
                 for e in elem:
                     self.serialize(write, e, qnames)
             if tag not in self.empty_elements:
-                write(u"</%s>" % tag)
+                write("</%s>" % tag)
 
         else:
             for e in elem:
@@ -1394,7 +1393,7 @@ class PolyglotWriter(MLBaseWriter):
 
     def __init__(self, encoding=None, namespaces={}):
         namespaces["http://www.w3.org/1999/xhtml"] = ''
-        super(PolyglotWriter, self).__init__(encoding, namespaces)
+        super().__init__(encoding, namespaces)
 
     def _serialize_element(self, write, elem, qnames, namespaces):
         tag = qnames[elem.tag]
@@ -1403,19 +1402,19 @@ class PolyglotWriter(MLBaseWriter):
             attrib_str = self._attrib_string(elem.attrib, qnames)
             namespace_str = self._namespace_string(namespaces)
             if len(elem):
-                write(u"<%s%s%s>" % (tag, attrib_str, namespace_str))
+                write("<{}{}{}>".format(tag, attrib_str, namespace_str))
                 for e in elem:
                     self.serialize(write, e, qnames)
-                write(u"</%s>" % tag)
+                write("</%s>" % tag)
             elif tag in self.void_elements:
-                write(u"<%s%s%s />" % (tag, attrib_str, namespace_str))
+                write("<{}{}{} />".format(tag, attrib_str, namespace_str))
             else:
-                write(u"<%s%s%s></%s>" % (tag, attrib_str, namespace_str, tag))
+                write("<{}{}{}></{}>".format(tag, attrib_str, namespace_str, tag))
 
         else:
             for e in elem:
                 self.serialize(write, e, qnames)
 
     def serialize_document_start(self, write):
-        write(u"<!DOCTYPE html>\n")
+        write("<!DOCTYPE html>\n")
 
