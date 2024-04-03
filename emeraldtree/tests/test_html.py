@@ -1,5 +1,4 @@
-import six
-from six import StringIO
+from io import StringIO
 
 from .. import html, tree
 
@@ -26,7 +25,7 @@ def test_read_text1():
     assert isinstance(elem, tree.Element)
     assert len(elem) == 1
     assert elem[0] == 'b'
-    assert isinstance(elem[0], six.text_type)
+    assert isinstance(elem[0], str)
 
 def test_read_text2():
     elem = html.HTML('<a>b<c>d</c>d</a>')

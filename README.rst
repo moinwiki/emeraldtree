@@ -16,8 +16,6 @@ please see the repositories:
 * https://github.com/moinwiki/emeraldtree/
 * http://svn.effbot.org/public/elementtree-1.3/
 
-Please note: EmeraldTree works with Python 2.7 or >=3.4.
-
 Changes are (c) by their authors (see also source files) and licensed
 under the same Python (MIT style) license as ElementTree (see below):
 

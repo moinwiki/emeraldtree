@@ -109,7 +109,7 @@ def include(elem, loader=None):
                 node = loader(href, parse)
                 if node is None:
                     raise FatalIncludeError(
-                        "cannot load %r as %r" % (href, parse)
+                        "cannot load {!r} as {!r}".format(href, parse)
                         )
                 node = copy.copy(node)
                 if e.tail:
@@ -119,7 +119,7 @@ def include(elem, loader=None):
                 text = loader(href, parse, e.get("encoding"))
                 if text is None:
                     raise FatalIncludeError(
-                        "cannot load %r as %r" % (href, parse)
+                        "cannot load {!r} as {!r}".format(href, parse)
                         )
                 if i:
                     node = elem[i-1]

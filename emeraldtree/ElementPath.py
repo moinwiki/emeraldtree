@@ -77,14 +77,12 @@ def prepare_tag(next, token):
 def prepare_star(next, token):
     def select(context, result):
         for elem in result:
-            for e in elem:
-                yield e
+            yield from elem
     return select
 
 def prepare_dot(next, token):
     def select(context, result):
-        for elem in result:
-            yield elem
+        yield from result
     return select
 
 def prepare_iter(next, token):
